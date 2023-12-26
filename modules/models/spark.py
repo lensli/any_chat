@@ -76,7 +76,8 @@ class Spark_Client(BaseLLMModel):
             self.spark_url = "wss://spark-api.xf-yun.com/v2.1/chat"
             self.domain = "generalv2"
         if "3.0" in self.model_name:
-            self.spark_url = "wss://spark-api.xf-yun.com/v3.1/chat"
+
+            self.spark_url = "ws(s)://spark-api.xf-yun.com/v3.1/chat"
             self.domain = "generalv3"
         else:
             self.spark_url = "wss://spark-api.xf-yun.com/v1.1/chat"

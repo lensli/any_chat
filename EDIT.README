@@ -1,0 +1,4 @@
+#install
+.\python3.11.7\python.exe -m pip install --upgrade pip 
+.\python3.11.7\python.exe -m pip install scikit-build 
+图标可定制
