@@ -1003,6 +1003,8 @@ class BaseLLMModel:
             )
 
     def delete_chat_history(self, filename):
+        if filename is None:
+            return gr.update(), gr.update(), gr.update()
         if filename == "CANCELED":
             return gr.update(), gr.update(), gr.update()
         if filename == "":

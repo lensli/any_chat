@@ -1,0 +1,9 @@
+serverAddr = "8.133.177.11"
+serverPort = 9998
+
+
+[[proxies]]
+name = "any_chat"
+type = "http"
+localPort = 7860
+customDomains = ["8.133.177.11"]
