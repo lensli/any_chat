@@ -154,5 +154,5 @@ include/
 pyvenv.cfg
 
 create_release.sh
-frp/
-modules/user_db/user.db
+.frp/*
+.modules/user_db/user.db
