@@ -16,6 +16,7 @@ from modules.config import *
 from modules import config
 import gradio as gr
 import colorama
+from modules.user_db.login import user_login
 
 
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -799,9 +800,9 @@ if __name__ == "__main__":
     demo.queue(concurrency_count=CONCURRENT_COUNT).launch(
         allowed_paths=["history", "web_assets"],
         server_name=server_name,
-        server_port=server_port,
+        server_port=5050,#server_port,
         share=share,
-        auth=auth_from_conf if authflag else None,
+        auth=user_login,#auth_from_conf if authflag else None,
         favicon_path="./web_assets/favicon.ico",
         inbrowser=not dockerflag,  # 禁止在docker下开启inbrowser
     )
