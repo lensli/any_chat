@@ -129,6 +129,7 @@ function menuClick() {
     adjustSide();
 }
 
+
 function toolboxClick() {
     shouldAutoClose = false;
     if (toolboxOpening) {
@@ -148,8 +149,8 @@ function toolboxClick() {
 var menuOpening = false;
 var toolboxOpening = false;
 var shouldAutoClose = true;
-var wantOpenMenu = windowWidth > 768;
-var wantOpenToolbox = windowWidth >= 1024;
+var wantOpenMenu = false//windowWidth > 768;
+var wantOpenToolbox = false//#windowWidth >= 1024;
 
 function adjustSide() {
     if (windowWidth >= 1024) {
