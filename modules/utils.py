@@ -641,7 +641,7 @@ def get_geoip():
     # 启动一个新线程来获取IP信息
     thread = threading.Thread(target=fetch_ip)
     thread.start()
-
+    SERVER_GEO_IP_MSG = ""
     # 返回一个默认消息，真正的IP信息将由新线程更新
     return i18n("正在获取IP地址信息，请稍候...")
 
