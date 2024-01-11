@@ -2,6 +2,7 @@
 import os
 from pathlib import Path
 import gradio as gr
+from .customer.config import logo_name
 from .webui_locale import I18nAuto
 
 i18n = I18nAuto()  # internationalization
@@ -46,41 +47,41 @@ SIM_K = 5
 INDEX_QUERY_TEMPRATURE = 1.0
 
 
-CHUANHU_TITLE = i18n("迪乐姆")
+CHUANHU_TITLE = i18n(logo_name)
 
 CHUANHU_DESCRIPTION = i18n("")
 
 
 ONLINE_MODELS = [
     "GPT3.5 Turbo",
-    "GPT3.5 Turbo Instruct",
+    # "GPT3.5 Turbo Instruct",
     "GPT3.5 Turbo 16K",
-    "GPT3.5 Turbo 0301",
-    "GPT3.5 Turbo 0613",
-    "GPT3.5 Turbo 1106",
+    # "GPT3.5 Turbo 0301",
+    # "GPT3.5 Turbo 0613",
+    # "GPT3.5 Turbo 1106",
     "GPT4",
     "GPT4 32K",
     "GPT4 Turbo",
     "GPT4 Vision",
     "川虎助理",
-    "川虎助理 Pro",
+    # "川虎助理 Pro",
     "DALL-E 3",
-    "GooglePaLM",
-    "xmchat",
-    "Azure OpenAI",
-    "yuanai-1.0-base_10B",
-    "yuanai-1.0-translate",
-    "yuanai-1.0-dialog",
-    "yuanai-1.0-rhythm_poems",
-    "minimax-abab5-chat",
+    # "GooglePaLM",
+    # "xmchat",
+    # "Azure OpenAI",
+    # "yuanai-1.0-base_10B",
+    # "yuanai-1.0-translate",
+    # "yuanai-1.0-dialog",
+    # "yuanai-1.0-rhythm_poems",
+    # "minimax-abab5-chat",
     "midjourney",
     "讯飞星火大模型V3.0",
     "讯飞星火大模型V2.0",
     "讯飞星火大模型V1.5",
-    "Claude",
-    "ERNIE-Bot-turbo",
-    "ERNIE-Bot",
-    "ERNIE-Bot-4",
+    # "Claude",
+    # "ERNIE-Bot-turbo",
+    # "ERNIE-Bot",
+    # "ERNIE-Bot-4",
 ]
 
 LOCAL_MODELS = [
@@ -91,11 +92,11 @@ LOCAL_MODELS = [
     "chatglm2-6b-int4",
     "chatglm3-6b",
     "chatglm3-6b-32k",
-    "StableLM",
-    "MOSS",
-    "Llama-2-7B-Chat",
-    "Qwen 7B",
-    "Qwen 14B"
+    # "StableLM",
+    # "MOSS",
+    # "Llama-2-7B-Chat",
+    # "Qwen 7B",
+    # "Qwen 14B"
 ]
 
 # Additional metadata for online and local models
@@ -188,7 +189,7 @@ for dir_name in os.listdir("models"):
             MODELS.append(dir_name)
 
 TOKEN_OFFSET = 1000 # 模型的token上限减去这个值，得到软上限。到达软上限之后，自动尝试减少token占用。
-DEFAULT_TOKEN_LIMIT = 3000 # 默认的token上限
+DEFAULT_TOKEN_LIMIT = 1280000#3000 # 默认的token上限
 REDUCE_TOKEN_FACTOR = 0.5 # 与模型token上限想乘，得到目标token数。减少token占用时，将token占用减少到目标token数以下。
 
 REPLY_LANGUAGES = [

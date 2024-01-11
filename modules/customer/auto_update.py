@@ -1,8 +1,10 @@
 #ChuanhuChatbot.py
 #demo.title = i18n("川虎Chat 🚀") 
 #demo.title = i18n("迪乐姆") 
+
 #favicon_path="./web_assets/favicon.ico",
 #favicon_path="./customer/dlm/favicon_dlm.ico",
+
 #gr.Markdown("# "+i18n("川虎Chat"))
 #gr.Markdown("# "+i18n("迪乐姆"))
 

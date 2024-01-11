@@ -67,8 +67,8 @@ class DB:
     def insert_users(self):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
-        for i in range(1, 28):  # 生成1到27的序列
-            username = f"ai{i:02}"  # 格式化用户名，保证是两位数
+        for i in range(1, 20):  # 生成1到27的序列
+            username = f"px{i:02}"  # 格式化用户名，保证是两位数
             password = "123456"
             consumption = 0.0
             recharge = 10.0
@@ -83,6 +83,7 @@ class DB:
         conn.close()
 
 if __name__ == "__main__":
-    db = DB()
-    db.create_database()
+    db = DB("C:\\home\\shared\\any_chat\\")
+    # db.create_database()
+    db.insert_users()
 

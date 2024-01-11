@@ -17,7 +17,7 @@ from modules import config
 import gradio as gr
 import colorama
 from modules.user_db.login import user_login
-
+from modules.customer.config import logo_name,any_icon_512,logo_favicon_path
 
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
@@ -421,8 +421,8 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
 
                     with gr.Tab(label=i18n("关于"), elem_id="about-tab"):
                         gr.Markdown(
-                            '<img alt="Chuanhu Chat logo" src="file=customer/dlm/logo.png" style="max-width: 144px;">')
-                        gr.Markdown("# "+i18n("迪乐姆"))
+                            f'<img alt="Chuanhu Chat logo" src="file={any_icon_512}" style="max-width: 144px;">')
+                        gr.Markdown("# "+i18n(logo_name))
                         gr.HTML(get_html("footer.html").format(
                             versions=versions_html()), elem_id="footer")
                         gr.Markdown(CHUANHU_DESCRIPTION, elem_id="description")
@@ -792,7 +792,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
     )
 
 # 默认开启本地服务器，默认可以直接从IP访问，默认不创建公开分享链接
-demo.title = i18n("迪乐姆")
+demo.title = i18n(logo_name)
 
 if __name__ == "__main__":
     reload_javascript()
@@ -803,6 +803,6 @@ if __name__ == "__main__":
         server_port=server_port,
         share=share,
         auth=user_login,#auth_from_conf if authflag else None,
-        favicon_path="./customer/dlm/favicon_dlm.ico",
+        favicon_path=logo_favicon_path,
         inbrowser=not dockerflag,  # 禁止在docker下开启inbrowser
     )

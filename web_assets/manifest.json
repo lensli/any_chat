@@ -1,19 +1,19 @@
 {
-    "name": "迪乐姆",
-    "short_name": "迪乐姆",
+    "name": "\u591a\u6a21\u6001\u5927\u6a21\u578b",
+    "short_name": "\u591a\u6a21\u6001\u5927\u6a21\u578b",
     "description": "",
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
     "icons": [
         {
-            "src": "/file=customer/dlm/logo.png",
+            "src": "/file=modules/customer/dlm/any-icon-512.png",
             "type": "image/png",
             "sizes": "512x512",
             "purpose": "maskable"
         },
         {
-            "src": "/file=customer/dlm/logo.png",
+            "src": "/file=modules/customer/dlm/mask-icon-512.png",
             "type": "image/png",
             "sizes": "512x512",
             "purpose": "any"
