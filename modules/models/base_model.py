@@ -310,7 +310,7 @@ class BaseLLMModel:
         user_token_count = self.count_token(inputs)
         self.all_token_counts.append(user_token_count)
         logging.debug(f"输入token计数: {user_token_count}")
-
+        #输入计费#########################################################
         stream_iter = self.get_answer_stream_iter()
 
         if display_append:
@@ -850,6 +850,7 @@ class BaseLLMModel:
             + i18n("，本次对话累计消耗了 ")
             + f"{token_sum} tokens"
         )
+        ####################################################总计费 
 
     def rename_chat_history(self, filename, chatbot):
         if filename == "":

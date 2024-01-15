@@ -1,4 +1,7 @@
+import os
 import sqlite3
+current_pyfile_path = os.path.abspath(__file__)
+USER_DB_PATH = os.path.join(os.path.dirname(current_pyfile_path),"any_userdb.db")
 class DB:
     def __init__(self,ob_path) -> None:
         self.name = "user.db"
@@ -67,8 +70,8 @@ class DB:
     def insert_users(self):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
-        for i in range(1, 20):  # 生成1到27的序列
-            username = f"px{i:02}"  # 格式化用户名，保证是两位数
+        for i in range(1, 28):  # 生成1到27的序列
+            username = f"ai{i:02}"  # 格式化用户名，保证是两位数
             password = "123456"
             consumption = 0.0
             recharge = 10.0
@@ -81,9 +84,56 @@ class DB:
         cursor.close()
         conn.commit()  # 提交事务
         conn.close()
+class User_Db:
+    def __init__(self) -> None:
+        self.db_path = USER_DB_PATH
+        self.conn = sqlite3.connect(self.db_path)
+        self.cur = self.conn.cursor()
+    def create_database(self):
+        create_table_query = """
+        CREATE TABLE IF NOT EXISTS users (
+            username TEXT NOT NULL,
+            password TEXT NOT NULL,
+            consumption INTEGER,
+            recharge INTEGER,
+            unit_times INTEGER,
+            use_nums INTEGER,
+            limit_times INTEGER,
+            last_reset_time TEXT,
+            enable_models TEXT,
+            admin_name TEXT
+        );
+        """
+        self.cur.execute(create_table_query)
+        self.conn.commit()
+    def insert_users(self,data_to_insert):
+        insert_data_query = """
+        INSERT INTO users (username, password, consumption, recharge, unit_times, use_nums, limit_times, last_reset_time, enable_models, admin_name)
+        VALUES
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        self.cur.executemany(insert_data_query, data_to_insert)
+        self.conn.commit()
+    def check_credentials(self, username, password):
+        self.cursor.execute(f"SELECT * FROM user WHERE username='{username}' AND password='{password}'")
+        result = self.cursor.fetchone()
+        if result:
+            return True
+        else:
+            return False
+    def __del__(self):
+        self.cur.close()
+        self.conn.close()
+
+
 
 if __name__ == "__main__":
-    db = DB("C:\\home\\shared\\any_chat\\")
+    # db = DB()
     # db.create_database()
-    db.insert_users()
-
+    udb = User_Db()
+    # udb.create_database()
+    users_0 = [
+        ['root', 'dlm00_416416', 5, 350, None, None, None, None, 'all', None],
+        ['ai01', '123456', 2, 5, 600, 1, 10, None, 'all', 'root'],
+    ]
+    udb.insert_users(users_0)

@@ -1,5 +1,5 @@
-from .database import DB
-ob_path = "C:\\home\\get$\\"
+from .database import User_Db
+
 def user_login(username,password):
-    db = DB(ob_path)
-    return db.check_credentials(username,password)
+    udb = User_Db()
+    return udb.check_credentials(username,password)

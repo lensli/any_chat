@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 import logging
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format="%(asctime)s [%(levelname)s] [%(filename)s:%(lineno)d] %(message)s",
 )
 
@@ -119,10 +119,12 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
         with gr.Column(elem_id="chuanhu-area", scale=5):
             with gr.Column(elem_id="chatbot-area"):
                 with gr.Row(elem_id="chatbot-header"):
+
                     model_select_dropdown = gr.Dropdown(
                         label=i18n("选择模型"), choices=MODELS, multiselect=False, value=MODELS[DEFAULT_MODEL], interactive=True,
                         show_label=False, container=False, elem_id="model-select-dropdown"
                     )
+                
                     lora_select_dropdown = gr.Dropdown(
                         label=i18n("选择LoRA模型"), choices=[], multiselect=False, interactive=True, visible=False,
                         container=False,
@@ -501,15 +503,20 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
         else:
             user_info, user_name = gr.Markdown.update(
                 value=f"", visible=False), ""
+        
+        
         current_model = get_model(
             model_name=MODELS[DEFAULT_MODEL], access_key=my_api_key, user_name=user_name)[0]
+        
         if not hide_history_when_not_logged_in or user_name:
             loaded_stuff = current_model.auto_load()
         else:
             loaded_stuff = [gr.update(), gr.update(), gr.Chatbot.update(label=MODELS[DEFAULT_MODEL]), current_model.single_turn, current_model.temperature, current_model.top_p, current_model.n_choices, current_model.stop_sequence, current_model.token_upper_limit, current_model.max_generation_token, current_model.presence_penalty, current_model.frequency_penalty, current_model.logit_bias, current_model.user_identifier]
         return user_info, user_name, current_model, toggle_like_btn_visibility(DEFAULT_MODEL), *loaded_stuff, init_history_list(user_name)
+    #服务器启动时 设置初始状态 适用与所有用户 每次访问时不能刷新
     demo.load(create_greeting, inputs=None, outputs=[
               user_info, user_name, current_model, like_dislike_area, saveFileName, systemPromptTxt, chatbot, single_turn_checkbox, temperature_slider, top_p_slider, n_choices_slider, stop_sequence_txt, max_context_length_slider, max_generation_slider, presence_penalty_slider, frequency_penalty_slider, logit_bias_txt, user_identifier_txt, historySelectList], api_name="load")
+    #推理函数输入 输出
     chatgpt_predict_args = dict(
         fn=predict,
         inputs=[
@@ -645,6 +652,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
     keyTxt.submit(**get_usage_args)
     single_turn_checkbox.change(
         set_single_turn, [current_model, single_turn_checkbox], None, show_progress=False)
+    
     model_select_dropdown.change(get_model, [model_select_dropdown, lora_select_dropdown, user_api_key, temperature_slider, top_p_slider, systemPromptTxt, user_name, current_model], [
                                  current_model, status_display, chatbot, lora_select_dropdown, user_api_key, keyTxt], show_progress=True, api_name="get_model")
     model_select_dropdown.change(toggle_like_btn_visibility, [model_select_dropdown], [
@@ -791,6 +799,8 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
         _js='(a,b)=>{return bgSelectHistory(a,b);}'
     )
 
+
+
 # 默认开启本地服务器，默认可以直接从IP访问，默认不创建公开分享链接
 demo.title = i18n(logo_name)
 
@@ -806,3 +816,4 @@ if __name__ == "__main__":
         favicon_path=logo_favicon_path,
         inbrowser=not dockerflag,  # 禁止在docker下开启inbrowser
     )
+#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

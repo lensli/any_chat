@@ -35,8 +35,9 @@ if TYPE_CHECKING:
         headers: List[str]
         data: List[List[str | int | bool]]
 
-
+#发送按钮调用预测
 def predict(current_model, *args):
+
     iter = current_model.predict(*args)
     for i in iter:
         yield i
@@ -634,6 +635,8 @@ def get_geoip():
                 SERVER_GEO_IP_MSG = i18n("您的IP区域：") + f"{country}。"
             logging.info(SERVER_GEO_IP_MSG)
         FETCHING_IP = False
+        #隐藏所有ip信息
+        SERVER_GEO_IP_MSG = ""
 
     # 设置正在获取IP信息的标志
     FETCHING_IP = True
@@ -641,7 +644,7 @@ def get_geoip():
     # 启动一个新线程来获取IP信息
     thread = threading.Thread(target=fetch_ip)
     thread.start()
-    SERVER_GEO_IP_MSG = ""
+
     # 返回一个默认消息，真正的IP信息将由新线程更新
     return i18n("正在获取IP地址信息，请稍候...")
 

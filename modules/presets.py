@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-import os
+import os,time
 from pathlib import Path
 import gradio as gr
 from .customer.config import logo_name
@@ -92,6 +92,7 @@ LOCAL_MODELS = [
     "chatglm2-6b-int4",
     "chatglm3-6b",
     "chatglm3-6b-32k",
+    str(time.time()),
     # "StableLM",
     # "MOSS",
     # "Llama-2-7B-Chat",
