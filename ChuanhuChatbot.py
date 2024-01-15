@@ -520,6 +520,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
     chatgpt_predict_args = dict(
         fn=predict,
         inputs=[
+            
             current_model,
             user_question,
             chatbot,
@@ -527,6 +528,8 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
             use_websearch_checkbox,
             index_files,
             language_select_dropdown,
+            user_name,
+            model_select_dropdown
         ],
         outputs=[chatbot, status_display],
         show_progress=True,

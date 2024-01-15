@@ -1,5 +1,5 @@
 import json
-
+any = ""
 logo_name = "多模态大模型"
 logo_favicon_path = "modules/customer/dlm/favicon.ico"
 

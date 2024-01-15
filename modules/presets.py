@@ -92,7 +92,6 @@ LOCAL_MODELS = [
     "chatglm2-6b-int4",
     "chatglm3-6b",
     "chatglm3-6b-32k",
-    str(time.time()),
     # "StableLM",
     # "MOSS",
     # "Llama-2-7B-Chat",

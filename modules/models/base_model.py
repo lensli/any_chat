@@ -38,7 +38,8 @@ from ..index_func import *
 from ..utils import *
 from .. import shared
 from ..config import retrieve_proxy
-
+from ..user_db.database import User_Db,get_deduction_amount
+from ..customer.config import any
 
 class CallbackToIterator:
     def __init__(self):
@@ -262,6 +263,11 @@ class BaseLLMModel:
 
         self.metadata = {}
 
+        self.user_name = ""
+        self.count_model_name = ""
+        self.input_amount = 0
+
+
     def get_answer_stream_iter(self):
         """Implement stream prediction.
         Conversations are stored in self.history, with the most recent question in OpenAI format.
@@ -310,7 +316,14 @@ class BaseLLMModel:
         user_token_count = self.count_token(inputs)
         self.all_token_counts.append(user_token_count)
         logging.debug(f"输入token计数: {user_token_count}")
-        #输入计费#########################################################
+        #输入计费===============================================================================================================================
+        self.input_amount = get_deduction_amount(inputs,self.count_model_name,"input")
+        udb = User_Db()
+        udb.deduct_balance(self.user_name,self.input_amount)
+        udb.__del__()
+
+
+        
         stream_iter = self.get_answer_stream_iter()
 
         if display_append:
@@ -322,6 +335,7 @@ class BaseLLMModel:
         for partial_text in stream_iter:
             if type(partial_text) == tuple:
                 partial_text, token_increment = partial_text
+
             chatbot[-1] = (chatbot[-1][0], partial_text + display_append)
             self.all_token_counts[-1] += token_increment
             status_text = self.token_message()
@@ -329,9 +343,24 @@ class BaseLLMModel:
             if self.interrupted:
                 self.recover()
                 break
+        #输出计费===============================================================================================================================
+        self.ouput_amount = get_deduction_amount(partial_text,self.count_model_name,"output")
+        udb = User_Db()
+        udb.deduct_balance(self.user_name,self.ouput_amount)
+        
         self.history.append(construct_assistant(partial_text))
+        result = udb.get_user_info(self.user_name)
+        status_text = (f"消费{int((self.ouput_amount+self.input_amount)*1000)}迪乐姆币,剩余{int((result[1]-result[0])*1000)}迪乐姆币")
+        yield get_return_value()
+        logging.debug(f"{result}")
+        udb.__del__()
 
     def next_chatbot_at_once(self, inputs, chatbot, fake_input=None, display_append=""):
+        #输入计费===============================================================================================================================
+        self.input_amount = get_deduction_amount(inputs,self.count_model_name,"input")
+        udb = User_Db()
+        udb.deduct_balance(self.user_name,self.input_amount)
+        udb.__del__()
         if fake_input:
             chatbot.append((fake_input, ""))
         else:
@@ -351,6 +380,14 @@ class BaseLLMModel:
         else:
             self.all_token_counts[-1] = total_token_count - sum(self.all_token_counts)
         status_text = self.token_message()
+
+        #输出计费===============================================================================================================================
+        self.ouput_amount = get_deduction_amount(status_text,self.count_model_name,"output")
+        udb = User_Db()
+        udb.deduct_balance(self.user_name,self.ouput_amount)
+        status_text = (f"消费{int((self.ouput_amount+self.input_amount)*1000)}迪乐姆币,剩余{int((result[1]-result[0])*1000)}迪乐姆币")
+        udb.__del__()
+
         return chatbot, status_text
 
     def handle_file_upload(self, files, chatbot, language):
@@ -509,8 +546,13 @@ class BaseLLMModel:
         use_websearch=False,
         files=None,
         reply_language="中文",
+        user_name = "erro",
+        model_select_dropdown = "GPT3.5 Turbo 16K",
         should_check_token_count=True,
+
     ):  # repetition_penalty, top_k
+        self.user_name = user_name
+        self.count_model_name = model_select_dropdown
         status_text = "开始生成回答……"
         if type(inputs) == list:
             logging.info(
@@ -844,11 +886,12 @@ class BaseLLMModel:
         token_sum = 0
         for i in range(len(token_lst)):
             token_sum += sum(token_lst[: i + 1])
+
         return (
-            i18n("Token 计数: ")
+            i18n("本次对话字数: ")
             + f"{sum(token_lst)}"
-            + i18n("，本次对话累计消耗了 ")
-            + f"{token_sum} tokens"
+            + i18n("，累计字数")
+            + f"{token_sum}"
         )
         ####################################################总计费 
 
