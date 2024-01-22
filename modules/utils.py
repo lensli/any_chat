@@ -90,7 +90,11 @@ def rename_chat_history(current_model, *args):
 
 
 def auto_name_chat_history(current_model, *args):
-    return current_model.auto_name_chat_history(*args)
+    try:
+        current_model.auto_name_chat_history(*args)
+    except Exception as e:
+        history_names =["new"]
+        return gr.Radio.update(choices=history_names, value=history_names[0] if history_names else "")
 
 
 def export_markdown(current_model, *args):

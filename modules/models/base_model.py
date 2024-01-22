@@ -316,14 +316,73 @@ class BaseLLMModel:
         user_token_count = self.count_token(inputs)
         self.all_token_counts.append(user_token_count)
         logging.debug(f"输入token计数: {user_token_count}")
+        
+        
+        
         #输入计费===============================================================================================================================
         self.input_amount = get_deduction_amount(inputs,self.count_model_name,"input")
         udb = User_Db()
+        consumption, recharge,reset_times,use_costs,limit_costs,last_reset_time,enable_models = udb.get_user_info(self.user_name)
+        if "all" in enable_models:
+            pass
+        elif self.count_model_name in enable_models:
+            pass
+        else:
+            
+            status_text = f"权限不足，该模型无法访问"
+            show_enable = enable_models.replace(',','\n')
+            partial_text = f"权限不足，您可以访问的模型是:{show_enable}"
+            chatbot[-1] = (chatbot[-1][0], partial_text + display_append)
+
+            yield get_return_value()
+            return chatbot, status_text
+
+
         udb.deduct_balance(self.user_name,self.input_amount)
         udb.__del__()
 
+        #总额度限制逻辑
+        if int(consumption) == int(recharge):
+            status_text = f"余额不足，剩余{recharge - consumption}"
+            partial_text = f"余额不足，剩余{recharge - consumption}"
+            chatbot[-1] = (chatbot[-1][0], partial_text + display_append)
 
+            yield get_return_value()
+            return chatbot, status_text
         
+
+        #定时清空限制频率额度
+        if last_reset_time is None:
+            last_reset_time = int(time.time())
+
+        if int(time.time()) - int(last_reset_time) > reset_times:
+            update_last_reset_time = int(time.time())
+            print("频率额度限制清零")
+            update_use_costs = 0
+        else:
+            update_last_reset_time = last_reset_time
+            update_use_costs = use_costs
+
+        #使用频率限制逻辑
+        if int(limit_costs) == int(update_use_costs):
+            status_text = f"到达时间限额,{int(reset_times)-(int(time.time())-int(last_reset_time))}秒后恢复"
+            partial_text = f"到达时间限额,{int(reset_times)-(int(time.time())-int(last_reset_time))}秒后恢复"
+            chatbot[-1] = (chatbot[-1][0], partial_text + display_append)
+            yield get_return_value()
+
+            udb = User_Db()
+            data = [(update_use_costs,update_last_reset_time,self.user_name)]
+            udb.update_last_reset_time(data)
+            udb.__del__()
+
+            return chatbot, status_text
+        
+        udb = User_Db()
+        data = [(update_use_costs,update_last_reset_time,self.user_name)]
+        udb.update_last_reset_time(data)
+        udb.__del__()
+
+    
         stream_iter = self.get_answer_stream_iter()
 
         if display_append:
@@ -347,13 +406,15 @@ class BaseLLMModel:
         self.ouput_amount = get_deduction_amount(partial_text,self.count_model_name,"output")
         udb = User_Db()
         udb.deduct_balance(self.user_name,self.ouput_amount)
-        
         self.history.append(construct_assistant(partial_text))
         result = udb.get_user_info(self.user_name)
+        udb.__del__()
         status_text = (f"消费{int((self.ouput_amount+self.input_amount)*1000)}迪乐姆币,剩余{int((result[1]-result[0])*1000)}迪乐姆币")
+        
+        
         yield get_return_value()
         logging.debug(f"{result}")
-        udb.__del__()
+       
 
     def next_chatbot_at_once(self, inputs, chatbot, fake_input=None, display_append=""):
         #输入计费===============================================================================================================================
@@ -551,7 +612,9 @@ class BaseLLMModel:
         should_check_token_count=True,
 
     ):  # repetition_penalty, top_k
-        self.user_name = user_name
+        if (self.user_name is None) or (self.user_name == ""):
+            self.user_name = user_name
+            
         self.count_model_name = model_select_dropdown
         status_text = "开始生成回答……"
         if type(inputs) == list:

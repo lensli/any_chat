@@ -145,9 +145,9 @@ class User_Db:
             password TEXT NOT NULL,
             consumption REAL,
             recharge REAL,
-            unit_times INTEGER,
-            use_nums INTEGER,
-            limit_times INTEGER,
+            reset_times INTEGER,
+            use_costs REAL,
+            limit_costs REAL,
             last_reset_time TEXT,
             enable_models TEXT,
             admin_name TEXT
@@ -157,11 +157,36 @@ class User_Db:
         self.conn.commit()
     def insert_users(self,data_to_insert):
         insert_data_query = """
-        INSERT INTO users (username, password, consumption, recharge, unit_times, use_nums, limit_times, last_reset_time, enable_models, admin_name)
+        INSERT INTO users (username, password, consumption, recharge, reset_times, use_costs, limit_costs, last_reset_time, enable_models, admin_name)
         VALUES
             (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         self.cur.executemany(insert_data_query, data_to_insert)
+        self.conn.commit()
+    def update_last_reset_time(self,data):
+        all ='''
+            UPDATE users
+            SET
+                # username = ?,
+                # password = ?,
+                # consumption = ?,
+                # recharge = ?,
+                # reset_times = ?,
+                use_costs = ?,
+                # limit_costs = ?,
+                last_reset_time = ?,
+
+            WHERE username = ?
+            """
+        '''
+        update_data_query = """
+            UPDATE users
+            SET
+                use_costs = ?,
+                last_reset_time = ?
+            WHERE username = ?
+        """
+        self.cur.executemany(update_data_query, data)
         self.conn.commit()
     def check_credentials(self, username, password):
         self.cur.execute(f"SELECT * FROM users WHERE username='{username}' AND password='{password}'")
@@ -171,10 +196,10 @@ class User_Db:
         else:
             return False
     def deduct_balance(self,username,amount):
-        self.cur.execute(f"SELECT consumption, recharge FROM users WHERE username='{username}'")
+        self.cur.execute(f"SELECT consumption, recharge,use_costs,limit_costs FROM users WHERE username='{username}'")
         result = self.cur.fetchone()
         if result:
-            current_consumption, current_recharge = result
+            current_consumption, current_recharge,use_costs,limit_costs = result
             # 计算新的消费额度
             new_consumption = current_consumption + amount
             # 如果新的消费额度大于充值额度，将消费额度设置为充值额度，并返回False
@@ -183,8 +208,16 @@ class User_Db:
                 result = False
             else:
                 result = True
+            if use_costs is None:
+                use_costs = 0
+            new_use_costs = use_costs + amount
+            if new_use_costs > limit_costs:
+                new_use_costs = limit_costs
+                result = False
+            else:
+                result = True
             # 更新数据库
-            self.cur.execute(f"UPDATE users SET consumption={new_consumption} WHERE username='{username}'")
+            self.cur.execute(f"UPDATE users SET consumption={new_consumption},use_costs={new_use_costs} WHERE username='{username}'")
             # 提交事务
             self.conn.commit()
         else:
@@ -192,7 +225,7 @@ class User_Db:
         
     def get_user_info(self, username):
 
-        self.cur.execute(f"SELECT consumption, recharge FROM users WHERE username='{username}'")
+        self.cur.execute(f"SELECT consumption, recharge,reset_times,use_costs,limit_costs,last_reset_time,enable_models FROM users WHERE username='{username}'")
         result = self.cur.fetchone()
 
         if result:
@@ -211,7 +244,7 @@ if __name__ == "__main__":
     udb.create_database()
     users_0 = [
         ['root', 'dlm00_416416', 5, 350, None, None, None, None, 'all', None],
-        ['ai01', '123456', 2, 5, 600, 1, 10, None, 'all', 'root'],
-        ['erro', '123456', 2, 5, 600, 1, 10, None, 'all', 'root'],
+        ['ai01', '123456', 2, 5, 60,0, 0.01, 1705289852, 'GPT3.5 Turbo 16K,', 'root'],
+        ['erro', '123456', 2, 5, 60, 0, 0.01, 1705289852, 'all', 'root'],
     ]
     udb.insert_users(users_0)
