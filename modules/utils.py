@@ -1506,7 +1506,7 @@ def setPlaceholder(model_name: str | None = "", model: BaseLLMModel | None = Non
         except:
             slogan_class = "hideK"
         try:
-            model_question_1 = i18n(model.placeholder["question_1"])
+            model_question_1 = i18n(model.["question_1"])
             model_question_2 = i18n(model.placeholder["question_2"])
             model_question_3 = i18n(model.placeholder["question_3"])
             model_question_4 = i18n(model.placeholder["question_4"])

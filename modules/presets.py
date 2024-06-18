@@ -55,9 +55,10 @@ CHUANHU_DESCRIPTION = i18n("")
 
 
 ONLINE_MODELS = [
+    "问答模型4o",
+    "生图模型de3",#DALL-E 3",
 
     "问答模型3.5",#"GPT3.5 Turbo 16K",
-    "问答模型4o",
     "问答模型4.0 Turbo",#"GPT4 Turbo",
     # "GPT3.5 Turbo",
     # "GPT3.5 Turbo Instruct",
@@ -67,10 +68,10 @@ ONLINE_MODELS = [
     # "GPT3.5 Turbo 1106",
     # "GPT4",
     "问答模型4.0",# "GPT4 32K",
-    "图像对话模型4v(不能生图)",#"GPT4 Vision",
+    # "图像对话模型4v(不能生图)",#"GPT4 Vision",
     # "川虎助理",
     # "川虎助理 Pro",
-    "生图模型de3",#DALL-E 3",
+
     # "GooglePaLM",
     # "xmchat",
     # "Azure OpenAI",
@@ -171,21 +172,45 @@ DEFAULT_METADATA = {
 
 # Additional metadata for online and local models
 MODEL_METADATA = {
+    "生图模型de3": {"model_name": "dall-e-3"},
     "问答模型3.5": {
         "model_name": "gpt-3.5-turbo-16k",
+        "description": "gpt3.5turbo_16k_description",
         "token_limit": 16384,
+        "placeholder": {
+            "logo": "file=web_assets/model_logos/openai-green.webp",
+            "slogan": i18n("gpt_default_slogan"),
+        }
     },
     "问答模型4o":{
         "model_name": "gpt-4o",
+        "description": "gpt4o_description",
+
         "token_limit": 128000,
+        "multimodal": True,
+        "placeholder": {
+            "logo": "file=web_assets/model_logos/falv.png",
+            "slogan": i18n("gpt_default_slogan"),
+        }
     },
     "问答模型4.0 Turbo": {
         "model_name": "gpt-4-turbo",
+        "description": "gpt4turbo_description",
         "token_limit": 128000,
+        "multimodal": True,
+        "placeholder": {
+            "logo": "file=web_assets/model_logos/openai-black.webp",
+            "slogan": i18n("gpt_default_slogan"),
+        }
     },
     "问答模型4.0": {
         "model_name": "gpt-4",
+        "description": "gpt4_description",
         "token_limit": 8192,
+        "placeholder": {
+            "logo": "file=web_assets/model_logos/openai-black.webp",
+            "slogan": i18n("gpt_default_slogan"),
+        }
     },
 
     "图像对话模型4v(不能生图)": {

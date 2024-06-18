@@ -175,7 +175,7 @@ class ModelType(Enum):
         # 2. infer model type from model name
         model_type = None
         model_name_lower = model_name.lower()
-        if model_name_lower  in "问答模型3.5,问答模型4.0 turbo,问答模型4.0":
+        if model_name_lower  in "问答模型3.5,问答模型4.0 turbo,问答模型4.0,问答模型4o":
             model_type = ModelType.OpenAI
             return model_type
         if model_name_lower in "图像对话模型4v(不能生图)":

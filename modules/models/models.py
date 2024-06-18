@@ -71,6 +71,7 @@ def get_model(
                 msg += f" + {lora_model_path}"
             model = LLaMA_Client(
                 model_name, lora_model_path, user_name=user_name)
+            pass
         elif model_type == ModelType.XMChat:
             from .XMChat import XMChat
             if os.environ.get("XMCHAT_API_KEY") != "":

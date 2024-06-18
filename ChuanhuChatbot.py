@@ -410,7 +410,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                             multiselect=False,
                             value=REPLY_LANGUAGES[0],
 
-                            visible=visible_ctrl
+                            visible = visible_ctrl,
 
                             elem_classes="no-container",
 
@@ -422,7 +422,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                             interactive=True,
                             value=HISTORY_NAME_METHODS[chat_name_method_index],
 
-                            visible=visible_ctrl
+                            visible=visible_ctrl,
 
                             elem_classes="no-container",
 
@@ -473,7 +473,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                         # gr.Markdown(CHUANHU_DESCRIPTION, elem_id="description")
 
 
-            with gr.Box(elem_id="chuanhu-training"):
+            with gr.Group(elem_id="chuanhu-training"):
                 # with gr.Row():
                 #     pass
                     # gr.Markdown("## "+i18n("训练"))
@@ -487,7 +487,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
 
                         with gr.Tab(label=i18n("准备数据集")):
 
-                            dataset_preview_json = gr.JSON(
+                            dataset_previewjson = gr.JSON(
                                 label=i18n("数据集预览"),visible=visible_ctrl)
 
                             dataset_selection = gr.Files(label=i18n("选择数据集"), file_types=[
@@ -868,8 +868,8 @@ demo.title = i18n(logo_name)
 if __name__ == "__main__":
     reload_javascript()
     setup_wizard()
-
-    demo.queue(concurrency_count=CONCURRENT_COUNT).launch(
+    #concurrency_count=CONCURRENT_COUNT
+    demo.queue().launch(
 
         allowed_paths=["history", "web_assets"],
         blocked_paths=["config.json", "files", "models", "lora", "modules"],

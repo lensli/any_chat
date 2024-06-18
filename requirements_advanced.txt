@@ -6,6 +6,8 @@ sentence_transformers
 accelerate
 sentencepiece
 # llama-cpp-python
+#$env:CMAKE_ARGS="-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS" 
+.\python3.11.7\python.exe -m pip install llama-cpp-python   --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu121 --no-build-isolation --no-isolation
 transformers_stream_generator
 einops
 optimum
