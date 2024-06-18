@@ -1,7 +1,7 @@
 import os
 import sqlite3
 current_pyfile_path = os.path.abspath(__file__)
-USER_DB_PATH = os.path.join(os.path.dirname(current_pyfile_path),"any_userdb.db")
+USER_DB_PATH = os.path.join(os.path.dirname(current_pyfile_path),"sqlite_db","any_userdb.db")
 class DB:
     def __init__(self,ob_path) -> None:
         self.name = "user.db"
@@ -141,28 +141,36 @@ class User_Db:
     def create_database(self):
         create_table_query = """
         CREATE TABLE IF NOT EXISTS users (
-            username TEXT NOT NULL,
-            password TEXT NOT NULL,
-            consumption REAL,
-            recharge REAL,
-            reset_times INTEGER,
-            use_costs REAL,
-            limit_costs REAL,
-            last_reset_time TEXT,
-            enable_models TEXT,
-            admin_name TEXT
-        );
+                username TEXT NOT NULL PRIMARY KEY,
+                password TEXT NOT NULL,
+                consumption REAL,
+                recharge REAL,
+                reset_times INTEGER,
+                use_costs REAL,
+                limit_costs REAL,
+                last_reset_time TEXT,
+                enable_models TEXT,
+                admin_name TEXT,
+                ip_whitelist TEXT
+            );
         """
         self.cur.execute(create_table_query)
         self.conn.commit()
     def insert_users(self,data_to_insert):
         insert_data_query = """
-        INSERT INTO users (username, password, consumption, recharge, reset_times, use_costs, limit_costs, last_reset_time, enable_models, admin_name)
+        INSERT INTO users (username, password, consumption, recharge, reset_times, use_costs, limit_costs, last_reset_time, enable_models, admin_name,ip_whitelist)
         VALUES
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
-        self.cur.executemany(insert_data_query, data_to_insert)
-        self.conn.commit()
+        try:
+            # self.cur.executemany(insert_data_query, data_to_insert)
+            self.cur.execute(insert_data_query, data_to_insert)
+            self.conn.commit()
+            print(f"成功插入了{self.cur.rowcount}行数据。")
+            return f"成功录入{self.cur.rowcount}个用户。"
+        except sqlite3.IntegrityError:
+            print("插入失败：键重复。")
+            return "注册失败用户名重复"
     def update_last_reset_time(self,data):
         all ='''
             UPDATE users
@@ -200,6 +208,8 @@ class User_Db:
         result = self.cur.fetchone()
         if result:
             current_consumption, current_recharge,use_costs,limit_costs = result
+            if limit_costs is None:
+                return True
             # 计算新的消费额度
             new_consumption = current_consumption + amount
             # 如果新的消费额度大于充值额度，将消费额度设置为充值额度，并返回False
@@ -225,13 +235,92 @@ class User_Db:
         
     def get_user_info(self, username):
 
-        self.cur.execute(f"SELECT consumption, recharge,reset_times,use_costs,limit_costs,last_reset_time,enable_models FROM users WHERE username='{username}'")
+        self.cur.execute(f"SELECT consumption, recharge,reset_times,use_costs,limit_costs,last_reset_time,enable_models,ip_whitelist FROM users WHERE username='{username}'")
         result = self.cur.fetchone()
 
         if result:
             return result
         else:
             return None
+    def update_user_info(self, username, password, consumption, recharge, reset_times, use_costs, limit_costs, enable_models, ip_whitelist):
+        parameters = []
+        sql_update_parts = []
+
+        if password != "不更改":
+            sql_update_parts.append("password = ?")
+            parameters.append(password)
+
+        if consumption != -1:
+            sql_update_parts.append("consumption = ?")
+            parameters.append(consumption)
+
+        if recharge != -1:
+            sql_update_parts.append("recharge = ?")
+            parameters.append(recharge)
+
+        if reset_times != -1:
+            sql_update_parts.append("reset_times = ?")
+            parameters.append(reset_times)
+
+        if use_costs != -1:
+            sql_update_parts.append("use_costs = ?")
+            parameters.append(use_costs)
+
+        if limit_costs != -1:
+            sql_update_parts.append("limit_costs = ?")
+            parameters.append(limit_costs)
+
+
+
+        if enable_models != "不更改":
+            sql_update_parts.append("enable_models = ?")
+            parameters.append(enable_models)
+
+        if ip_whitelist != "不更改":
+            sql_update_parts.append("ip_whitelist = ?")
+            parameters.append(ip_whitelist)
+
+        if sql_update_parts:
+            sql_update_string = ", ".join(sql_update_parts)
+            parameters.append(username)
+            sql_statement = f"UPDATE users SET {sql_update_string} WHERE username = ?"
+
+            self.cur.execute(sql_statement, parameters)
+            self.cur.connection.commit()
+
+
+
+        self.cur.execute(f"SELECT username,password,consumption, recharge,reset_times,use_costs,limit_costs,last_reset_time,enable_models,ip_whitelist FROM users WHERE username ='{username}'")
+        results = self.cur.fetchall()
+
+        if results:
+            return results
+        else:
+            return ()
+    def get_sub_username(self,username):
+        self.cur.execute(f"SELECT username,password,consumption, recharge,reset_times,use_costs,limit_costs,last_reset_time,enable_models,ip_whitelist FROM users WHERE admin_name='{username}'")
+        results = self.cur.fetchall()
+
+        if results:
+            return results
+        else:
+            return None
+    def delete_user_by_username(self, username):
+        try:
+            # 使用 ? 作为参数占位符
+            self.cur.execute("DELETE FROM users WHERE username = ?", (username,))
+            
+            # 提交事务
+            self.conn.commit()  # 使用self.conn替代conn
+            
+            return f"成功删除 username = '{username}' 的用户记录。"
+        except Exception as e:
+            self.conn.rollback()  # 如果出现错误，使用self.conn回滚事务
+            return f"删除操作失败: {e}"
+
+    
+
+
     def __del__(self):
         self.conn.close()
 
@@ -243,8 +332,16 @@ if __name__ == "__main__":
     udb = User_Db()
     udb.create_database()
     users_0 = [
-        ['root', 'dlm00_416416', 5, 350, None, None, None, None, 'all', None],
-        ['ai01', '123456', 2, 5, 60,0, 0.01, 1705289852, 'GPT3.5 Turbo 16K,', 'root'],
-        ['erro', '123456', 2, 5, 60, 0, 0.01, 1705289852, 'all', 'root'],
+        ['root', 'dlm00_416416', 5, 350, None, None, None, None, 'all', None,"all"],
+        ['shljh', '123456', 2, 5, 60, 0, 0.01, 1705289852, 'all', 'root',"all"],
+        ['ai01', '123456', 2, 5, 60,0, 0.01, 1705289852, 'GPT3.5 Turbo 16K,', 'root',"all"],
+        ['ai02', '123456', 2, 5, 60,0, 0.01, 1705289852, 'GPT3.5 Turbo 16K,', 'root',"all"],
+        ['erro', '123456', 2, 5, 60, 0, 0.01, 1705289852, 'all', 'root',"all"],
+        ['root_jy', '123456', 2, 500, 60, 0, 500, 1705289852, 'all', 'root',"all"],
+        ['root_sh', '123456', 2, 500, 60, 0, 500, 1705289852, 'all', 'root',"all"],
+        ['root_hzm', '123456', 2, 500, 60, 0, 500, 1705289852, 'all', 'root',"all"],
+        ['zwh_root', 'zwh731278', 2, 500, 60, 0, 500, 1705289852, 'all', 'root',"all"],
+
     ]
-    udb.insert_users(users_0)
+    for _ in users_0:
+        udb.insert_users(_)

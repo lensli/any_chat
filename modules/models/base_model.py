@@ -39,7 +39,9 @@ from ..utils import *
 from .. import shared
 from ..config import retrieve_proxy
 from ..user_db.database import User_Db,get_deduction_amount
-from ..customer.config import any
+from ..customer.config import any,coin_name
+import tiktoken
+
 
 class CallbackToIterator:
     def __init__(self):
@@ -160,6 +162,15 @@ class ModelType(Enum):
     def get_type(cls, model_name: str):
         model_type = None
         model_name_lower = model_name.lower()
+        if model_name_lower  in "问答模型3.5,问答模型4.0 turbo,问答模型4.0":
+            model_type = ModelType.OpenAI
+            return model_type
+        if model_name_lower in "图像对话模型4v(不能生图)":
+            model_type = ModelType.OpenAIVision
+            return model_type
+        if model_name_lower in "生图模型de3":
+            model_type = ModelType.DALLE3
+            return model_type
         if "gpt" in model_name_lower:
             if "instruct" in model_name_lower:
                 model_type = ModelType.OpenAIInstruct
@@ -266,6 +277,7 @@ class BaseLLMModel:
         self.user_name = ""
         self.count_model_name = ""
         self.input_amount = 0
+        self.enc = tiktoken.get_encoding("cl100k_base")
 
 
     def get_answer_stream_iter(self):
@@ -288,6 +300,7 @@ class BaseLLMModel:
         """
         logging.warning("at once predict not implemented, using stream predict instead")
         response_iter = self.get_answer_stream_iter()
+
         count = 0
         for response in response_iter:
             count += 1
@@ -301,6 +314,7 @@ class BaseLLMModel:
     def count_token(self, user_input):
         """get token count from input, implement if needed"""
         # logging.warning("token count not implemented, using default")
+
         return len(user_input)
 
     def stream_next_chatbot(self, inputs, chatbot, fake_input=None, display_append=""):
@@ -322,7 +336,7 @@ class BaseLLMModel:
         #输入计费===============================================================================================================================
         self.input_amount = get_deduction_amount(inputs,self.count_model_name,"input")
         udb = User_Db()
-        consumption, recharge,reset_times,use_costs,limit_costs,last_reset_time,enable_models = udb.get_user_info(self.user_name)
+        consumption, recharge,reset_times,use_costs,limit_costs,last_reset_time,enable_models,ip_whitelist = udb.get_user_info(self.user_name)
         if "all" in enable_models:
             pass
         elif self.count_model_name in enable_models:
@@ -354,33 +368,33 @@ class BaseLLMModel:
         #定时清空限制频率额度
         if last_reset_time is None:
             last_reset_time = int(time.time())
+        if reset_times is not None:
+            if int(time.time()) - int(last_reset_time) > reset_times:
+                update_last_reset_time = int(time.time())
+                print("频率额度限制清零")
+                update_use_costs = 0
+            else:
+                update_last_reset_time = last_reset_time
+                update_use_costs = use_costs
 
-        if int(time.time()) - int(last_reset_time) > reset_times:
-            update_last_reset_time = int(time.time())
-            print("频率额度限制清零")
-            update_use_costs = 0
-        else:
-            update_last_reset_time = last_reset_time
-            update_use_costs = use_costs
+            #使用频率限制逻辑
+            if int(limit_costs) == int(update_use_costs):
+                status_text = f"到达时间限额,{int(reset_times)-(int(time.time())-int(last_reset_time))}秒后恢复"
+                partial_text = f"到达时间限额,{int(reset_times)-(int(time.time())-int(last_reset_time))}秒后恢复"
+                chatbot[-1] = (chatbot[-1][0], partial_text + display_append)
+                yield get_return_value()
 
-        #使用频率限制逻辑
-        if int(limit_costs) == int(update_use_costs):
-            status_text = f"到达时间限额,{int(reset_times)-(int(time.time())-int(last_reset_time))}秒后恢复"
-            partial_text = f"到达时间限额,{int(reset_times)-(int(time.time())-int(last_reset_time))}秒后恢复"
-            chatbot[-1] = (chatbot[-1][0], partial_text + display_append)
-            yield get_return_value()
+                udb = User_Db()
+                data = [(update_use_costs,update_last_reset_time,self.user_name)]
+                udb.update_last_reset_time(data)
+                udb.__del__()
 
+                return chatbot, status_text
+        
             udb = User_Db()
             data = [(update_use_costs,update_last_reset_time,self.user_name)]
             udb.update_last_reset_time(data)
             udb.__del__()
-
-            return chatbot, status_text
-        
-        udb = User_Db()
-        data = [(update_use_costs,update_last_reset_time,self.user_name)]
-        udb.update_last_reset_time(data)
-        udb.__del__()
 
     
         stream_iter = self.get_answer_stream_iter()
@@ -395,6 +409,7 @@ class BaseLLMModel:
             if type(partial_text) == tuple:
                 partial_text, token_increment = partial_text
 
+            
             chatbot[-1] = (chatbot[-1][0], partial_text + display_append)
             self.all_token_counts[-1] += token_increment
             status_text = self.token_message()
@@ -409,7 +424,7 @@ class BaseLLMModel:
         self.history.append(construct_assistant(partial_text))
         result = udb.get_user_info(self.user_name)
         udb.__del__()
-        status_text = (f"消费{int((self.ouput_amount+self.input_amount)*1000)}迪乐姆币,剩余{int((result[1]-result[0])*1000)}迪乐姆币")
+        status_text = (f"消费{int((self.ouput_amount+self.input_amount)*1000)}{coin_name},剩余{int((result[1]-result[0])*1000)}{coin_name}")
         
         
         yield get_return_value()
@@ -446,7 +461,7 @@ class BaseLLMModel:
         self.ouput_amount = get_deduction_amount(status_text,self.count_model_name,"output")
         udb = User_Db()
         udb.deduct_balance(self.user_name,self.ouput_amount)
-        status_text = (f"消费{int((self.ouput_amount+self.input_amount)*1000)}迪乐姆币,剩余{int((result[1]-result[0])*1000)}迪乐姆币")
+        status_text = (f"消费{int((self.ouput_amount+self.input_amount)*1000)}{coin_name},剩余{int((result[1]-result[0])*1000)}{coin_name}")
         udb.__del__()
 
         return chatbot, status_text
@@ -612,6 +627,7 @@ class BaseLLMModel:
         should_check_token_count=True,
 
     ):  # repetition_penalty, top_k
+
         if (self.user_name is None) or (self.user_name == ""):
             self.user_name = user_name
             

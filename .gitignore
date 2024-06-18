@@ -156,3 +156,4 @@ pyvenv.cfg
 create_release.sh
 frp/*
 modules/user_db/user.db
+*.db

@@ -1,4 +1,5 @@
 import json
+
 any = ""
 logo_name = "多模态大模型"
 logo_favicon_path = "modules/customer/dlm/favicon.ico"
@@ -6,6 +7,10 @@ logo_favicon_path = "modules/customer/dlm/favicon.ico"
 
 any_icon_512 = "modules/customer/dlm/any-icon-512.png"
 mask_icon_512 = "modules/customer/dlm/mask-icon-512.png"
+bot_avatar_path = "modules/customer/dlm/robot-256.png"
+user_avatar_path = "modules/customer/dlm/user_256.png"
+
+coin_name = "金币"
 
 
 def update_json(path,data):
@@ -28,6 +33,7 @@ def update_json(path,data):
         json.dump(data, file, indent=4)
 
     print("JSON file has been updated.")
+
 import sys
 from .lifen_comn import get_current_pyfileabspath,abs_path2relative_path
 abs_pyfile = get_current_pyfileabspath()
@@ -52,10 +58,12 @@ data = {
 
 }
 update_json(manifest_json_path,data)
+
 config_json_path = abs_path2relative_path(abs_pyfile,"..\\..\\config.json")
+
 data = {
-    "bot_avatar": "modules/customer/dlm/robot-256.png", 
-    "user_avatar": "modules/customer/dlm/user_256.png"
+    "bot_avatar": bot_avatar_path, 
+    "user_avatar": user_avatar_path
 }
 update_json(config_json_path,data)
 

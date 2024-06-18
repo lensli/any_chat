@@ -27,7 +27,7 @@ import colorama
 from modules.presets import *
 from . import shared
 from modules.config import retrieve_proxy, hide_history_when_not_logged_in
-
+from modules.user_db.database import User_Db
 if TYPE_CHECKING:
     from typing import TypedDict
 
@@ -36,9 +36,39 @@ if TYPE_CHECKING:
         data: List[List[str | int | bool]]
 
 #发送按钮调用预测
-def predict(current_model, *args):
-
-    iter = current_model.predict(*args)
+def predict(current_model,request: gr.Request,user_question,
+            chatbot,
+            use_streaming_checkbox,
+            use_websearch_checkbox,
+            index_files,
+            language_select_dropdown,
+            user_name,
+            model_select_dropdown):
+    
+    if request:
+        udb = User_Db()
+        logging.debug(request.client.host)
+        consumption, recharge,reset_times,use_costs,limit_costs,last_reset_time,enable_models,ip_whitelist = udb.get_user_info(user_name)
+        if "all" not in str(ip_whitelist):
+            if str(request.client.host) not in str(ip_whitelist):
+                yield "","此设备禁止登录"
+                return
+            else:
+                pass 
+        else:
+            pass
+            
+    if current_model is None:
+        yield "","请刷新网页重新登录"
+    iter = current_model.predict(user_question,
+            chatbot,
+            use_streaming_checkbox,
+            use_websearch_checkbox,
+            index_files,
+            language_select_dropdown,
+            user_name,
+            model_select_dropdown,
+            request)
     for i in iter:
         yield i
 

@@ -1,0 +1,27 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE users (
+            username TEXT NOT NULL,
+            password TEXT NOT NULL,
+            consumption REAL,
+            recharge REAL,
+            reset_times INTEGER,
+            use_costs REAL,
+            limit_costs REAL,
+            last_reset_time TEXT,
+            enable_models TEXT,
+            admin_name TEXT
+        , ip_whitelist);
+INSERT INTO users VALUES('root','dlm00_416416',413.55927999999995137,35000.0,600000000,1.4828399999999999359,350.0,'1708336697','all',NULL,'all');
+INSERT INTO users VALUES('ai01','123456',4.7588639999999857721,5.0,500,0.052632000000000003225,2.0030000000000001136,'1706521605','GPT3.5 Turbo 16K,','root',NULL);
+INSERT INTO users VALUES('erro','123456',5.0,5.0,60,0.01,0.01,'1708336708','all','root',NULL);
+INSERT INTO users VALUES('root_jy','123456',55.728559999999989216,100.0,600,1.5294000000000000483,50.0,'1708397171','all',NULL,'all');
+INSERT INTO users VALUES('root_hzm','123456',0.95819999999999989626,5000.0,60,0.15660000000000002806,5000.0,'1706844443','all',NULL,'all');
+INSERT INTO users VALUES('root_sh','123456',6.5573599999999991894,50.0,600,0.001,600000000000.0,'1706534815','all',NULL,'all');
+INSERT INTO users VALUES('sh_ljh','123456',0.0,5000.0,6000,0.0,5000.0,NULL,'all','root',NULL);
+INSERT INTO users VALUES('ai02','123456789',0.0,50.0,600,0.0,5.0,NULL,'all','root','all');
+INSERT INTO users VALUES('jy01','123456',0.17639999999999997903,50.0,600,0.17159999999999997477,5.0,'1708396168','all','root_jy','all');
+INSERT INTO users VALUES('jy02','123456',0.0,50.0,600,0.0,5.0,NULL,'all','root_jy','all');
+INSERT INTO users VALUES('zwh_root','zwh731278',0.02391999999999999904,5000000.0,60000000,0.0,5000000.0,'1707881962','all','root','all');
+INSERT INTO users VALUES('user01','123456',0.0,50.0,3600,0.0,5.0,NULL,'all','root_jy','all');
+COMMIT;

@@ -1,5 +1,9 @@
 # -*- coding:utf-8 -*-
-import logging
+visible_ctrl = False
+import logging,os,sys
+sys.path.insert(0,os.path.dirname(__file__))
+
+
 logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s [%(levelname)s] [%(filename)s:%(lineno)d] %(message)s",
@@ -200,21 +204,22 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                         obj="toolbox"), elem_classes="close-btn")
                 with gr.Tabs(elem_id="chuanhu-toolbox-tabs"):
                     with gr.Tab(label=i18n("对话")):
-                        with gr.Accordion(label=i18n("模型"), open=not HIDE_MY_KEY, visible=not HIDE_MY_KEY):
+                        with gr.Accordion(label=i18n("模型"), open=not HIDE_MY_KEY, visible=visible_ctrl):
                             keyTxt = gr.Textbox(
                                 show_label=True,
                                 placeholder=f"Your API-key...",
                                 value=hide_middle_chars(user_api_key.value),
                                 type="password",
-                                visible=not HIDE_MY_KEY,
+                                visible=visible_ctrl,
                                 label="API-Key",
                             )
                             if multi_api_key:
                                 usageTxt = gr.Markdown(i18n(
-                                    "多账号模式已开启，无需输入key，可直接开始对话"), elem_id="usage-display", elem_classes="insert-block", visible=show_api_billing)
+                                    "多账号模式已开启，无需输入key，可直接开始对话"), elem_id="usage-display", elem_classes="insert-block", visible=visible_ctrl)
                             else:
                                 usageTxt = gr.Markdown(i18n(
-                                    "**发送消息** 或 **提交key** 以显示额度"), elem_id="usage-display", elem_classes="insert-block", visible=show_api_billing)
+                                    "**发送消息** 或 **提交key** 以显示额度"), elem_id="usage-display", elem_classes="insert-block", visible=visible_ctrl)
+                        
                         gr.Markdown("---", elem_classes="hr-line", visible=not HIDE_MY_KEY)
                         with gr.Accordion(label="Prompt", open=True):
                             systemPromptTxt = gr.Textbox(
@@ -264,9 +269,9 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                             # formula_ocr = gr.Checkbox(label=i18n("识别公式"), value=advance_docs["pdf"].get("formula_ocr", False))
 
                     with gr.Tab(label=i18n("参数")):
-                        gr.Markdown(i18n("# ⚠️ 务必谨慎更改 ⚠️"),
-                                    elem_id="advanced-warning")
-                        with gr.Accordion(i18n("参数"), open=True):
+                        # gr.Markdown(i18n("# ⚠️ 务必谨慎更改 ⚠️"),
+                        #             elem_id="advanced-warning",visible=visible_ctrl)
+                        with gr.Accordion(i18n("参数"), open=True,visible=visible_ctrl):
                             temperature_slider = gr.Slider(
                                 minimum=-0,
                                 maximum=2.0,
@@ -274,6 +279,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                                 step=0.1,
                                 interactive=True,
                                 label="temperature",
+                                visible=visible_ctrl
                             )
                             top_p_slider = gr.Slider(
                                 minimum=-0,
@@ -282,6 +288,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                                 step=0.05,
                                 interactive=True,
                                 label="top-p",
+                                visible=visible_ctrl
                             )
                             n_choices_slider = gr.Slider(
                                 minimum=1,
@@ -290,6 +297,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                                 step=1,
                                 interactive=True,
                                 label="n choices",
+                                visible=visible_ctrl
                             )
                             stop_sequence_txt = gr.Textbox(
                                 show_label=True,
@@ -297,6 +305,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                                 label="stop",
                                 value="",
                                 lines=1,
+                                visible=visible_ctrl
                             )
                             max_context_length_slider = gr.Slider(
                                 minimum=1,
@@ -305,6 +314,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                                 step=1,
                                 interactive=True,
                                 label="max context",
+                                visible=visible_ctrl
                             )
                             max_generation_slider = gr.Slider(
                                 minimum=1,
@@ -313,6 +323,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                                 step=1,
                                 interactive=True,
                                 label="max generations",
+                                visible=visible_ctrl
                             )
                             presence_penalty_slider = gr.Slider(
                                 minimum=-2.0,
@@ -321,6 +332,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                                 step=0.01,
                                 interactive=True,
                                 label="presence penalty",
+                                visible=visible_ctrl
                             )
                             frequency_penalty_slider = gr.Slider(
                                 minimum=-2.0,
@@ -329,6 +341,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                                 step=0.01,
                                 interactive=True,
                                 label="frequency penalty",
+                                visible=visible_ctrl
                             )
                             logit_bias_txt = gr.Textbox(
                                 show_label=True,
@@ -336,6 +349,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                                 label="logit bias",
                                 value="",
                                 lines=1,
+                                visible=visible_ctrl
                             )
                             user_identifier_txt = gr.Textbox(
                                 show_label=True,
@@ -343,12 +357,13 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                                 label=i18n("用户标识符"),
                                 value=user_name.value,
                                 lines=1,
+                                visible=visible_ctrl
                             )
                     with gr.Tab(label=i18n("拓展")):
                         gr.Markdown(
-                            "Will be here soon...\n(We hope)\n\nAnd we hope you can help us to make more extensions!")
+                            "Will be here soon...\n(We hope)\n\nAnd we hope you can help us to make more extensions!",visible=False)
 
-                    # changeAPIURLBtn = gr.Button(i18n("🔄 切换API地址"))
+                    changeAPIURLBtn = gr.Button(i18n("🔄 切换API地址"),visible=False)
 
     with gr.Row(elem_id="popup-wrapper"):
         with gr.Box(elem_id="chuanhu-popup"):
@@ -373,13 +388,14 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                         gr.HTML(get_html("appearance_switcher.html").format(
                             label=i18n("切换亮暗色主题")), elem_classes="insert-block", visible=False)
                         use_streaming_checkbox = gr.Checkbox(
-                            label=i18n("实时传输回答"), value=True, visible=ENABLE_STREAMING_OPTION, elem_classes="switch-checkbox"
+                            label=i18n("实时传输回答"), value=True, visible=visible_ctrl, elem_classes="switch-checkbox"
                         )
                         language_select_dropdown = gr.Dropdown(
                             label=i18n("选择回复语言（针对搜索&索引功能）"),
                             choices=REPLY_LANGUAGES,
                             multiselect=False,
                             value=REPLY_LANGUAGES[0],
+                            visible=visible_ctrl
                         )
                         name_chat_method = gr.Dropdown(
                             label=i18n("对话命名方式"),
@@ -387,15 +403,16 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                             multiselect=False,
                             interactive=True,
                             value=HISTORY_NAME_METHODS[chat_name_method_index],
+                            visible=visible_ctrl
                         )
                         single_turn_checkbox = gr.Checkbox(label=i18n(
-                            "单轮对话"), value=False, elem_classes="switch-checkbox", elem_id="gr-single-session-cb", visible=False)
+                            "单轮对话"), value=False, elem_classes="switch-checkbox", elem_id="gr-single-session-cb", visible=visible_ctrl)
                         # checkUpdateBtn = gr.Button(i18n("🔄 检查更新..."), visible=check_update)
 
                     with gr.Tab(i18n("网络")):
-                        gr.Markdown(
-                            i18n("⚠️ 为保证API-Key安全，请在配置文件`config.json`中修改网络设置"), elem_id="netsetting-warning")
-                        default_btn = gr.Button(i18n("🔙 恢复默认网络设置"))
+                        # gr.Markdown(
+                        #     i18n("⚠️ 为保证API-Key安全，请在配置文件`config.json`中修改网络设置"), elem_id="netsetting-warning")
+                        default_btn = gr.Button(i18n("🔙 恢复默认网络设置"),visible=visible_ctrl)
                         # 网络代理
                         proxyTxt = gr.Textbox(
                             show_label=True,
@@ -406,6 +423,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                             interactive=False,
                             # container=False,
                             elem_classes="view-only-textbox no-container",
+                            visible=visible_ctrl
                         )
                         # changeProxyBtn = gr.Button(i18n("🔄 设置代理地址"))
 
@@ -419,50 +437,52 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                             interactive=False,
                             # container=False,
                             elem_classes="view-only-textbox no-container",
+                            visible=visible_ctrl
                         )
 
                     with gr.Tab(label=i18n("关于"), elem_id="about-tab"):
                         gr.Markdown(
                             f'<img alt="Chuanhu Chat logo" src="file={any_icon_512}" style="max-width: 144px;">')
-                        gr.Markdown("# "+i18n(logo_name))
-                        gr.HTML(get_html("footer.html").format(
-                            versions=versions_html()), elem_id="footer")
-                        gr.Markdown(CHUANHU_DESCRIPTION, elem_id="description")
+                        # gr.Markdown("# "+i18n(logo_name))
+                        # gr.HTML(get_html("footer.html").format(
+                        #     versions=versions_html()), elem_id="footer")
+                        # gr.Markdown(CHUANHU_DESCRIPTION, elem_id="description")
 
             with gr.Box(elem_id="chuanhu-training"):
-                with gr.Row():
-                    gr.Markdown("## "+i18n("训练"))
-                    gr.HTML(get_html("close_btn.html").format(
-                        obj="box"), elem_classes="close-btn")
+                # with gr.Row():
+                #     pass
+                    # gr.Markdown("## "+i18n("训练"))
+                    # gr.HTML(get_html("close_btn.html").format(
+                    #     obj="box"), elem_classes="close-btn")
                 with gr.Tabs(elem_id="chuanhu-training-tabs"):
-                    with gr.Tab(label="OpenAI "+i18n("微调")):
+                    with gr.Tab(label="大模型"+i18n("微调")):
                         openai_train_status = gr.Markdown(label=i18n("训练状态"), value=i18n(
-                            "查看[使用介绍](https://github.com/GaiZhenbiao/ChuanhuChatGPT/wiki/使用教程#微调-gpt-35)"))
+                            "查看[使用介绍](https://github.com/GaiZhenbiao/ChuanhuChatGPT/wiki/使用教程#微调-gpt-35)"),visible=visible_ctrl)
 
                         with gr.Tab(label=i18n("准备数据集")):
                             dataset_preview_json = gr.JSON(
-                                label=i18n("数据集预览"))
+                                label=i18n("数据集预览"),visible=visible_ctrl)
                             dataset_selection = gr.Files(label=i18n("选择数据集"), file_types=[
-                                                         ".xlsx", ".jsonl"], file_count="single")
+                                                         ".xlsx", ".jsonl"], file_count="single",visible=visible_ctrl)
                             upload_to_openai_btn = gr.Button(
-                                i18n("上传到OpenAI"), variant="primary", interactive=False)
+                                i18n("上传到OpenAI"), variant="primary", interactive=False,visible=visible_ctrl)
 
                         with gr.Tab(label=i18n("训练")):
                             openai_ft_file_id = gr.Textbox(label=i18n(
-                                "文件ID"), value="", lines=1, placeholder=i18n("上传到 OpenAI 后自动填充"))
+                                "文件ID"), value="", lines=1, placeholder=i18n("上传到 OpenAI 后自动填充"),visible=visible_ctrl)
                             openai_ft_suffix = gr.Textbox(label=i18n(
-                                "模型名称后缀"), value="", lines=1, placeholder=i18n("可选，用于区分不同的模型"))
+                                "模型名称后缀"), value="", lines=1, placeholder=i18n("可选，用于区分不同的模型"),visible=visible_ctrl)
                             openai_train_epoch_slider = gr.Slider(label=i18n(
-                                "训练轮数（Epochs）"), minimum=1, maximum=100, value=3, step=1, interactive=True)
+                                "训练轮数（Epochs）"), minimum=1, maximum=100, value=3, step=1, interactive=True,visible=visible_ctrl)
                             openai_start_train_btn = gr.Button(
-                                i18n("开始训练"), variant="primary", interactive=False)
+                                i18n("开始训练"), variant="primary", interactive=False,visible=visible_ctrl)
 
                         with gr.Tab(label=i18n("状态")):
-                            openai_status_refresh_btn = gr.Button(i18n("刷新状态"))
+                            openai_status_refresh_btn = gr.Button(i18n("刷新状态"),visible=visible_ctrl)
                             openai_cancel_all_jobs_btn = gr.Button(
-                                i18n("取消所有任务"))
+                                i18n("取消所有任务"),visible=visible_ctrl)
                             add_to_models_btn = gr.Button(
-                                i18n("添加训练好的模型到模型列表"), interactive=False)
+                                i18n("添加训练好的模型到模型列表"), interactive=False,visible=visible_ctrl)
 
             with gr.Box(elem_id="web-config", visible=False):
                 gr.HTML(get_html('web_config.html').format(
@@ -529,7 +549,8 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
             index_files,
             language_select_dropdown,
             user_name,
-            model_select_dropdown
+            model_select_dropdown,
+
         ],
         outputs=[chatbot, status_display],
         show_progress=True,
@@ -810,13 +831,15 @@ demo.title = i18n(logo_name)
 if __name__ == "__main__":
     reload_javascript()
     setup_wizard()
+
     demo.queue(concurrency_count=CONCURRENT_COUNT).launch(
         allowed_paths=["history", "web_assets"],
         server_name=server_name,
         server_port=server_port,
         share=share,
         auth=user_login,#auth_from_conf if authflag else None,
+        auth_message = "请输入账号和密码",
         favicon_path=logo_favicon_path,
         inbrowser=not dockerflag,  # 禁止在docker下开启inbrowser
     )
-#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
+

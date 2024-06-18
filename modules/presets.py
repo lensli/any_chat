@@ -53,19 +53,21 @@ CHUANHU_DESCRIPTION = i18n("")
 
 
 ONLINE_MODELS = [
-    "GPT3.5 Turbo",
+    "问答模型3.5",#"GPT3.5 Turbo 16K",
+    "问答模型4o",
+    "问答模型4.0 Turbo",#"GPT4 Turbo",
+    # "GPT3.5 Turbo",
     # "GPT3.5 Turbo Instruct",
-    "GPT3.5 Turbo 16K",
+    
     # "GPT3.5 Turbo 0301",
     # "GPT3.5 Turbo 0613",
     # "GPT3.5 Turbo 1106",
-    "GPT4",
-    "GPT4 32K",
-    "GPT4 Turbo",
-    "GPT4 Vision",
-    "川虎助理",
+    # "GPT4",
+    "问答模型4.0",# "GPT4 32K",
+    "图像对话模型4v(不能生图)",#"GPT4 Vision",
+    # "川虎助理",
     # "川虎助理 Pro",
-    "DALL-E 3",
+    "生图模型de3",#DALL-E 3",
     # "GooglePaLM",
     # "xmchat",
     # "Azure OpenAI",
@@ -74,7 +76,7 @@ ONLINE_MODELS = [
     # "yuanai-1.0-dialog",
     # "yuanai-1.0-rhythm_poems",
     # "minimax-abab5-chat",
-    "midjourney",
+    # "midjourney",
     "讯飞星火大模型V3.0",
     "讯飞星火大模型V2.0",
     "讯飞星火大模型V1.5",
@@ -85,13 +87,13 @@ ONLINE_MODELS = [
 ]
 
 LOCAL_MODELS = [
-    "chatglm-6b",
-    "chatglm-6b-int4",
-    "chatglm-6b-int4-ge",
-    "chatglm2-6b",
-    "chatglm2-6b-int4",
-    "chatglm3-6b",
-    "chatglm3-6b-32k",
+    # "chatglm-6b",
+    # "chatglm-6b-int4",
+    # "chatglm-6b-int4-ge",
+    # "chatglm2-6b",
+    # "chatglm2-6b-int4",
+    # "chatglm3-6b",
+    # "chatglm3-6b-32k",
     # "StableLM",
     # "MOSS",
     # "Llama-2-7B-Chat",
@@ -101,6 +103,27 @@ LOCAL_MODELS = [
 
 # Additional metadata for online and local models
 MODEL_METADATA = {
+    "问答模型3.5": {
+        "model_name": "gpt-3.5-turbo-16k",
+        "token_limit": 16384,
+    },
+    "问答模型4o":{
+        "model_name": "gpt-4o",
+        "token_limit": 128000,
+    },
+    "问答模型4.0 Turbo": {
+        "model_name": "gpt-4-turbo",
+        "token_limit": 128000,
+    },
+    "问答模型4.0": {
+        "model_name": "gpt-4",
+        "token_limit": 8192,
+    },
+
+    "图像对话模型4v(不能生图)": {
+        "model_name": "gpt-4-vision-preview",
+        "token_limit": 128000,
+    },
     "Llama-2-7B":{
         "repo_id": "TheBloke/Llama-2-7B-GGUF",
         "filelist": ["llama-2-7b.Q6_K.gguf"],
@@ -148,11 +171,14 @@ MODEL_METADATA = {
         "token_limit": 32768,
     },
     "GPT4 Turbo": {
-        "model_name": "gpt-4-1106-preview",
+        # "model_name": "gpt-4-1106-preview",
+        # "model_name": "gpt-4-0125-preview",
+        "model_name": "gpt-4-turbo",
         "token_limit": 128000,
     },
     "GPT4 Vision": {
         "model_name": "gpt-4-vision-preview",
+        # "model_name": "gpt-4-turbo",
         "token_limit": 128000,
     },
     "Claude": {

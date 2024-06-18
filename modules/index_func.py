@@ -66,8 +66,24 @@ def get_documents(file_src):
             else:
                 logging.debug("Loading text file...")
                 from langchain.document_loaders import TextLoader
-                loader = TextLoader(filepath, "utf8")
-                texts = loader.load()
+
+                text_file_extensions = {
+                    '.txt', '.csv', '.log', '.md', '.json', '.xml',
+                    '.html', '.htm', '.conf', '.ini', '.yml', '.yaml',
+                    '.sql', '.py', '.java', '.cpp', '.cs', '.js', '.php', '.rb', '.tex'
+                }
+                _, ext = os.path.splitext(filepath)
+                if ext.lower() in text_file_extensions:
+                    loader = TextLoader(filepath, "utf8")
+                    texts = loader.load()
+                else:
+                    texts = [
+                        Document(page_content='no anything', metadata={'source': 'C:\\Users\\lf804\\AppData\\Local\\Temp\\gradio\\6788a761d4ec9d8d5fdf318f47c359866082087e\\1.txt'}), 
+                        
+                        ]
+
+                
+                
         except Exception as e:
             import traceback
             logging.error(f"Error loading file: {filename}")
