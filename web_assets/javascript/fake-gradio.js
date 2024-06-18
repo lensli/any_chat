@@ -35,6 +35,7 @@ function setUploader() {
         }
     });
     uploaderObserver.observe(uploaderIndicator, {attributes: true})
+    uploaderObserver.observe(uploaderIndicator2, {attributes: true})
 }
 var grUploader;
 var chatbotUploader;
@@ -114,4 +115,8 @@ function bgSelectHistory(a,b){
     const historySelectorInput = gradioApp().querySelector('#history-select-dropdown input');
     let file = historySelectorInput.value;
     return [a,file]
+}
+
+function bgRebootChuanhu() {
+    rebootChuanhuBtn.click()
 }
