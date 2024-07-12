@@ -166,7 +166,8 @@ if __name__ == "__main__":
     CONCURRENT_COUNT = 100
     server_name = "0.0.0.0"
     server_port = 9093
-    demo.queue(concurrency_count=CONCURRENT_COUNT).launch(
+    #concurrency_count=CONCURRENT_COUNT
+    demo.queue().launch(
         server_name=server_name,
         server_port=server_port,
         share=False,

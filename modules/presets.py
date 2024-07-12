@@ -172,7 +172,9 @@ DEFAULT_METADATA = {
 
 # Additional metadata for online and local models
 MODEL_METADATA = {
-    "生图模型de3": {"model_name": "dall-e-3"},
+    "生图模型de3": {
+        "model_name": "dall-e-3",
+        },
     "问答模型3.5": {
         "model_name": "gpt-3.5-turbo-16k",
         "description": "gpt3.5turbo_16k_description",
@@ -189,7 +191,7 @@ MODEL_METADATA = {
         "token_limit": 128000,
         "multimodal": True,
         "placeholder": {
-            "logo": "file=web_assets/model_logos/falv.png",
+            "logo": "file=web_assets/model_logos/openai-green.webp",
             "slogan": i18n("gpt_default_slogan"),
         }
     },

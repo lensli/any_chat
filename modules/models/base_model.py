@@ -1107,6 +1107,7 @@ class BaseLLMModel:
         save_file(filename, self, chatbot)
 
     def load_chat_history(self, new_history_file_path=None):
+        self.user_name = self.user_identifier
         logging.debug(f"{self.user_name} 加载对话历史中……")
         if new_history_file_path is not None:
             if type(new_history_file_path) != str:
