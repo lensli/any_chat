@@ -663,6 +663,10 @@ class BaseLLMModel:
                         proxies["https"] = proxy[1]
                 else:
                     proxies = None
+                proxies = {
+                    "http":"http://192.168.9.137:7990",
+                    "https":"http://192.168.9.137:7990"
+                }
                 with DDGS(proxies=proxies) as ddgs:
                     ddgs_gen = ddgs.text(fake_inputs, backend="lite")
                     for r in islice(ddgs_gen, 10):

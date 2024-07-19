@@ -68,7 +68,8 @@ def refresh_dropdown(request: gr.Request):
     updated_options = get_user_for_db(request.username)
     updated_options.insert(0, "all")
       # 更新 Dropdown 组件的选项
-    return gr.Dropdown.update(choices=updated_options)
+    return  gr.Dropdown(choices=updated_options, interactive=True)
+    # return gr.Dropdown.update(choices=updated_options)
 def delee_database_data(dropdown):
     show_txt = ""
     for user_name in dropdown:

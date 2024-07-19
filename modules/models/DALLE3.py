@@ -57,6 +57,8 @@ class OpenAI_DALLE3_Client(BaseLLMModel):
                 revised_prompt = response_data['data'][0].get('revised_prompt', '')
                 return img_tag + revised_prompt, 0
             except requests.exceptions.RequestException as e:
+                if "Your request was rejected as a result of our safety system. Image descriptions generated from your prompt may contain text that is not allowed by our safety system. If you believe this was done in error, your request may succeed if retried, or by adjusting your prompt" in response.json().get("error",{"":""}).get("message",""):
+                    return "提示词违规 请换个说法吧 ",0
                 return str(e), 0
 
     def _refresh_header(self):
