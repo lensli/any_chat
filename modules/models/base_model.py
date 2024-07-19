@@ -162,6 +162,9 @@ class ModelType(Enum):
     GoogleGemma = 20
     Ollama = 21
     Groq = 22
+    Suno = 23
+    Vedio = 24
+    Dance = 25
 
     @classmethod
     def get_type(cls, model_name: str):
@@ -175,6 +178,15 @@ class ModelType(Enum):
         # 2. infer model type from model name
         model_type = None
         model_name_lower = model_name.lower()
+        if "唱歌模型" in model_name_lower:
+            model_type = ModelType.Suno
+            return model_type
+        if "视频模型" in model_name_lower:
+            model_type = ModelType.Vedio
+            return model_type
+        if "跳舞模型" in model_name_lower:
+            model_type = ModelType.Dance
+            return model_type
         if model_name_lower  in "问答模型3.5,问答模型4.0 turbo,问答模型4.0,问答模型4o":
             model_type = ModelType.OpenAI
             return model_type

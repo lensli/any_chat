@@ -57,9 +57,12 @@ CHUANHU_DESCRIPTION = i18n("")
 ONLINE_MODELS = [
     "问答模型4o",
     "生图模型de3",#DALL-E 3",
+    "唱歌模型_v3",
+    "视频模型",
+    "跳舞模型",
 
     "问答模型3.5",#"GPT3.5 Turbo 16K",
-    "问答模型4.0 Turbo",#"GPT4 Turbo",
+    # "问答模型4.0 Turbo",#"GPT4 Turbo",
     # "GPT3.5 Turbo",
     # "GPT3.5 Turbo Instruct",
     
@@ -67,7 +70,7 @@ ONLINE_MODELS = [
     # "GPT3.5 Turbo 0613",
     # "GPT3.5 Turbo 1106",
     # "GPT4",
-    "问答模型4.0",# "GPT4 32K",
+    # "问答模型4.0",# "GPT4 32K",
     # "图像对话模型4v(不能生图)",#"GPT4 Vision",
     # "川虎助理",
     # "川虎助理 Pro",
@@ -82,8 +85,8 @@ ONLINE_MODELS = [
     # "minimax-abab5-chat",
     "midjourney",
     "讯飞星火大模型V3.0",
-    "讯飞星火大模型V2.0",
-    "讯飞星火大模型V1.5",
+    # "讯飞星火大模型V2.0",
+    # "讯飞星火大模型V1.5",
     # "Claude",
     # "ERNIE-Bot-turbo",
     # "ERNIE-Bot",
@@ -172,6 +175,15 @@ DEFAULT_METADATA = {
 
 # Additional metadata for online and local models
 MODEL_METADATA = {
+    "唱歌模型_v3":{
+        "model_name": "suno_v3",
+    },
+    "视频模型":{
+        "model_name": "vedio",
+    },
+    "跳舞模型":{
+        "model_name": "dance",
+    },
     "生图模型de3": {
         "model_name": "dall-e-3",
         },
