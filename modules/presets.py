@@ -56,12 +56,13 @@ CHUANHU_DESCRIPTION = i18n("")
 
 ONLINE_MODELS = [
     "问答模型4o",
+    "问答模型4o-mini",
     "生图模型de3",#DALL-E 3",
     "唱歌模型_v3",
     "视频模型",
-    "跳舞模型",
+    # "跳舞模型",
 
-    "问答模型3.5",#"GPT3.5 Turbo 16K",
+    # "问答模型3.5",#"GPT3.5 Turbo 16K",
     # "问答模型4.0 Turbo",#"GPT4 Turbo",
     # "GPT3.5 Turbo",
     # "GPT3.5 Turbo Instruct",
@@ -204,6 +205,16 @@ MODEL_METADATA = {
         "multimodal": True,
         "placeholder": {
             "logo": "file=web_assets/model_logos/openai-green.webp",
+            "slogan": i18n("gpt_default_slogan"),
+        }
+    },
+    "问答模型4o-mini":{
+        "model_name": "gpt-4o-mini",
+        "description": "gpt4omini_description",
+        "token_limit": 128000,
+        "multimodal": True,
+        "placeholder": {
+            "logo": "file=web_assets/model_logos/openai-black.webp",
             "slogan": i18n("gpt_default_slogan"),
         }
     },
