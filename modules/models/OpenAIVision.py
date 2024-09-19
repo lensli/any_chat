@@ -43,13 +43,31 @@ class OpenAIVisionClient(BaseLLMModel):
         self._refresh_header()
 
     def get_answer_stream_iter(self):
+        if self.model_name in "o1-preview,o1-mini":
+            # 使用生成器将 content 的内容逐步返回
+            content, total_token_count = self.get_answer_at_once()
+            partial_text = ""
+            batch = []
+            batch_size = 10 
+            for i in content:
+                batch.append(i)
+                if len(batch) >= batch_size:
+                    partial_text += ''.join(batch)
+                    batch.clear()
+                    yield partial_text
+            return
         response = self._get_response(stream=True)
         if response is not None:
             iter = self._decode_chat_response(response)
             partial_text = ""
+            batch = []
+            batch_size = 10 
             for i in iter:
-                partial_text += i
-                yield partial_text
+                batch.append(i)
+                if len(batch) >= batch_size:
+                    partial_text += ''.join(batch)
+                    batch.clear()
+                    yield partial_text
         else:
             yield STANDARD_ERROR_MSG + GENERAL_ERROR_MSG
 
@@ -160,18 +178,29 @@ class OpenAIVisionClient(BaseLLMModel):
             "Content-Type": "application/json",
             "Authorization": f"Bearer {openai_api_key}",
         }
+        # "问答模型o1-pre",
+        # "问答模型o1-mini",
 
-        if system_prompt is not None:
+        if system_prompt is not None and "o1" not in self.model_name:
             history = [construct_system(system_prompt), *history]
 
-        payload = {
-            "model": self.model_name,
-            "messages": history,
-            "temperature": self.temperature,
-            "top_p": self.top_p,
-            "n": self.n_choices,
-            "stream": stream,
-        }
+        if self.model_name in "o1-preview,o1-mini":
+            payload = {
+                "model": self.model_name,
+                "messages": history,
+                "temperature": self.temperature,
+                "top_p": self.top_p,
+                "n": self.n_choices,
+            }
+        else:
+            payload = {
+                "model": self.model_name,
+                "messages": history,
+                "temperature": self.temperature,
+                "top_p": self.top_p,
+                "n": self.n_choices,
+                "stream": stream,
+            }
 
         if self.max_generation_token:
             payload["max_tokens"] = self.max_generation_token

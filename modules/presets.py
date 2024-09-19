@@ -57,9 +57,11 @@ CHUANHU_DESCRIPTION = i18n("")
 ONLINE_MODELS = [
     "问答模型4o",
     "问答模型4o-mini",
+    "问答模型o1-pre",
+    "问答模型o1-mini",
     "生图模型de3",#DALL-E 3",
-    "唱歌模型_v3",
-    "视频模型",
+    # "唱歌模型_v3",
+    # "视频模型",
     # "跳舞模型",
 
     # "问答模型3.5",#"GPT3.5 Turbo 16K",
@@ -84,7 +86,7 @@ ONLINE_MODELS = [
     # "yuanai-1.0-dialog",
     # "yuanai-1.0-rhythm_poems",
     # "minimax-abab5-chat",
-    "midjourney",
+    # "midjourney",
     "讯飞星火大模型V3.0",
     # "讯飞星火大模型V2.0",
     # "讯飞星火大模型V1.5",
@@ -176,6 +178,32 @@ DEFAULT_METADATA = {
 
 # Additional metadata for online and local models
 MODEL_METADATA = {
+    # "问答模型o1-pre",
+    # "问答模型o1-mini",
+    "问答模型o1-pre": {
+        "model_name": "o1-preview",
+        "description": "o1-preview_description",
+        "token_limit": 128000,
+        "multimodal": False,
+        # "model_type": "OpenAIVision",
+        "stream": False,
+        "placeholder": {
+            "logo": "file=web_assets/model_logos/openai-black.webp",
+            "slogan": i18n("gpt_default_slogan"),
+        }
+    },
+    "问答模型o1-mini": {
+        "model_name": "o1-mini",
+        "description": "o1-mini_description",
+        "token_limit": 128000,
+        "multimodal": False,
+        # "model_type": "OpenAIVision",
+        "stream": False,
+        "placeholder": {
+            "logo": "file=web_assets/model_logos/openai-black.webp",
+            "slogan": i18n("gpt_default_slogan"),
+        }
+    },
     "唱歌模型_v3":{
         "model_name": "suno_v3",
     },
