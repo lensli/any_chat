@@ -70,18 +70,11 @@ class Spark_Client(BaseLLMModel):
 
         if None in [self.api_key, self.appid, self.api_secret]:
             raise Exception("请在配置文件或者环境变量中设置讯飞的API Key、APP ID和API Secret")
-        if "2.0" in self.model_name:
-            self.spark_url = "ws://spark-api.xf-yun.com/v2.1/chat"
-            self.domain = "generalv2"
-        if "3.0" in self.model_name:
 
-            self.spark_url = "ws://spark-api.xf-yun.com/v3.1/chat"
 
-            self.domain = "generalv3"
+        self.spark_url = f"wss://spark-api.xf-yun.com{self.metadata['path']}"
+        self.domain = self.metadata['domain']
 
-        else:
-            self.spark_url = "ws://spark-api.xf-yun.com/v1.1/chat"
-            self.domain = "general"
 
     # 收到websocket错误的处理
     def on_error(self, ws, error):

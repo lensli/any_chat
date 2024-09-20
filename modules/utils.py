@@ -9,12 +9,12 @@ import datetime
 import csv
 import threading
 import requests
-import re
 import hmac
 import html
 import hashlib
 
 import gradio as gr
+import regex as re
 import getpass
 from pypinyin import lazy_pinyin
 import tiktoken
@@ -27,8 +27,9 @@ import colorama
 
 from modules.presets import *
 from . import shared
-from modules.config import retrieve_proxy, hide_history_when_not_logged_in
+from modules.config import retrieve_proxy, hide_history_when_not_logged_in,admin_list
 from modules.user_db.database import User_Db
+
 if TYPE_CHECKING:
     from typing import TypedDict
     from .models.base_model import BaseLLMModel
@@ -134,7 +135,7 @@ def export_markdown(current_model, *args):
 
 
 def upload_chat_history(current_model, *args):
-    return current_model.load_chat_history(*args)
+    return current_model.upload_chat_history(*args)
 
 
 def set_token_upper_limit(current_model, *args):
@@ -179,6 +180,9 @@ def set_user_identifier(current_model, *args):
 
 def set_single_turn(current_model, *args):
     current_model.set_single_turn(*args)
+
+def set_streaming(current_model, *args):
+    current_model.set_streaming(*args)
 
 
 def handle_file_upload(current_model, *args):
@@ -274,6 +278,35 @@ def convert_mdtext(md_text):  # deprecated
     output += raw
     output += ALREADY_CONVERTED_MARK
     return output
+
+def remove_html_tags(data):
+    def clean_text(text):
+        # Regular expression to match code blocks, including all newlines
+        code_block_pattern = r'(```[\s\S]*?```)'
+
+        # Split the text into code blocks and non-code blocks
+        parts = re.split(code_block_pattern, text)
+
+        cleaned_parts = []
+        for part in parts:
+            if part.startswith('```') and part.endswith('```'):
+                # This is a code block, keep it exactly as is
+                cleaned_parts.append(part)
+            else:
+                # This is not a code block, remove HTML tags
+                # Remove all HTML tags
+                cleaned = re.sub(r'<[^>]+>', '', part)
+                # Remove any remaining HTML entities
+                cleaned = re.sub(r'&[#\w]+;', '', cleaned)
+                cleaned_parts.append(cleaned)  # Don't strip here to preserve newlines
+
+        # Join the cleaned parts back together
+        return ''.join(cleaned_parts)
+
+    return [
+        [clean_text(item) for item in sublist]
+        for sublist in data
+    ]
 
 
 def clip_rawtext(chat_message, need_escape=True):
@@ -412,9 +445,10 @@ def construct_assistant(text):
     return construct_text("assistant", text)
 
 
-def save_file(filename, model, chatbot):
+def save_file(filename, model):
     system = model.system_prompt
     history = model.history
+    chatbot = [(history[i]["content"], history[i + 1]["content"]) for i in range(0, len(history), 2)]
     user_name = model.user_name
     os.makedirs(os.path.join(HISTORY_DIR, user_name), exist_ok=True)
     if filename is None:
@@ -442,6 +476,7 @@ def save_file(filename, model, chatbot):
         "frequency_penalty": model.frequency_penalty,
         "logit_bias": model.logit_bias,
         "user_identifier": model.user_identifier,
+        "stream": model.stream,
         "metadata": model.metadata,
     }
     if not filename == os.path.basename(filename):
@@ -449,20 +484,26 @@ def save_file(filename, model, chatbot):
     else:
         history_file_path = os.path.join(HISTORY_DIR, user_name, filename)
 
+    # check if history file path matches user_name
+    # if user access control is not enabled, user_name is empty, don't check
+    assert os.path.basename(os.path.dirname(history_file_path)) == model.user_name or model.user_name == ""
     with open(history_file_path, "w", encoding="utf-8") as f:
         json.dump(json_s, f, ensure_ascii=False, indent=4)
 
-    filename = os.path.basename(filename)
-    filename_md = filename[:-5] + ".md"
-    md_s = f"system: \n- {system} \n"
-    for data in history:
-        md_s += f"\n{data['role']}: \n- {data['content']} \n"
-    with open(
-        os.path.join(HISTORY_DIR, user_name, filename_md), "w", encoding="utf8"
-    ) as f:
-        f.write(md_s)
-    return os.path.join(HISTORY_DIR, user_name, filename)
+    save_md_file(history_file_path)
+    return history_file_path
 
+def save_md_file(json_file_path):
+    with open(json_file_path, "r", encoding="utf-8") as f:
+        json_data = json.load(f)
+
+    md_file_path = json_file_path[:-5] + ".md"
+    md_s = f"system: \n- {json_data['system']} \n"
+    for data in json_data['history']:
+        md_s += f"\n{data['role']}: \n- {data['content']} \n"
+
+    with open(md_file_path, "w", encoding="utf8") as f:
+        f.write(md_s)
 
 def sorted_by_pinyin(list):
     return sorted(list, key=lambda char: lazy_pinyin(char)[0][0])
@@ -510,6 +551,9 @@ def get_history_names(user_name=""):
     if user_name == "" and hide_history_when_not_logged_in:
         return []
     else:
+        user_history_dir = os.path.join(HISTORY_DIR, user_name)
+        # ensure the user history directory is inside the HISTORY_DIR
+        assert os.path.realpath(user_history_dir).startswith(os.path.realpath(HISTORY_DIR))
         history_files = get_file_names_by_last_modified_time(
             os.path.join(HISTORY_DIR, user_name)
         )
@@ -539,7 +583,7 @@ def init_history_list(user_name="", prepend=None):
 def filter_history(user_name, keyword):
     history_names = get_history_names(user_name)
     try:
-        history_names = [name for name in history_names if re.search(keyword, name)]
+        history_names = [name for name in history_names if re.search(keyword, name, timeout=0.01)]
         return gr.update(choices=history_names)
     except:
         return gr.update(choices=history_names)
@@ -548,13 +592,17 @@ def filter_history(user_name, keyword):
 def load_template(filename, mode=0):
     logging.debug(f"加载模板文件{filename}，模式为{mode}（0为返回字典和下拉菜单，1为返回下拉菜单，2为返回字典）")
     lines = []
+    template_file_path = os.path.join(TEMPLATES_DIR, filename)
+    # check if template_file_path is inside TEMPLATES_DIR
+    if not os.path.realpath(template_file_path).startswith(os.path.realpath(TEMPLATES_DIR)):
+        return "Invalid template file path"
     if filename.endswith(".json"):
-        with open(os.path.join(TEMPLATES_DIR, filename), "r", encoding="utf8") as f:
+        with open(template_file_path, "r", encoding="utf8") as f:
             lines = json.load(f)
         lines = [[i["act"], i["prompt"]] for i in lines]
     else:
         with open(
-            os.path.join(TEMPLATES_DIR, filename), "r", encoding="utf8"
+            template_file_path, "r", encoding="utf8"
         ) as csvfile:
             reader = csv.reader(csvfile)
             lines = list(reader)
@@ -734,7 +782,9 @@ def transfer_input(inputs):
     )
 
 
-def update_chuanhu():
+def update_chuanhu(username):
+    if username not in admin_list:
+        return gr.Markdown(value=i18n("no_permission_to_update_description"))
     from .repo import background_update
 
     print("[Updater] Trying to update...")
@@ -869,6 +919,10 @@ def beautify_err_msg(err_msg):
         )
     if "Resource not found" in err_msg:
         return i18n("请查看 config_example.json，配置 Azure OpenAI")
+    try:
+        err_msg = json.loads(err_msg)["error"]["message"]
+    except:
+        pass
     return err_msg
 
 
@@ -1530,3 +1584,6 @@ def setPlaceholder(model_name: str | None = "", model: BaseLLMModel | None = Non
             chatbot_ph_slogan_class = slogan_class,
             chatbot_ph_question_class = question_class
         )
+
+def download_file(path):
+    print(path)

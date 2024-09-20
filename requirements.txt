@@ -1,5 +1,6 @@
 gradio==4.26.0
 gradio_client==0.15.1
+primp==0.5.5
 pypinyin
 tiktoken
 socksio
@@ -40,3 +41,4 @@ Pillow>=10.1.0
 protobuf==3.20.3
 ollama>=0.1.6
 numexpr
+regex

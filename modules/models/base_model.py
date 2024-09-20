@@ -17,6 +17,8 @@ from typing import Any, Dict, List, Optional
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, TypeVar, Union
 from uuid import UUID
 from langchain_core.outputs import ChatGenerationChunk, GenerationChunk
+from gradio.utils import get_upload_folder
+from gradio.processing_utils import save_file_to_cache
 
 import colorama
 import PIL
@@ -29,16 +31,19 @@ from langchain.schema import (AgentAction, AgentFinish, AIMessage, BaseMessage,
                               HumanMessage, SystemMessage)
 
 from .. import shared
-from ..config import retrieve_proxy
+
+from ..config import retrieve_proxy,auth_list
 
 from ..user_db.database import User_Db,get_deduction_amount
 from ..customer.config import any,coin_name
 import tiktoken
 
+
 from ..index_func import *
 from ..presets import *
 from ..utils import *
 
+GRADIO_CACHE = get_upload_folder()
 
 
 class CallbackToIterator:
@@ -135,6 +140,7 @@ class ChuanhuCallbackHandler(BaseCallbackHandler):
             containing content and other information.
         """
         logging.info(f"### CHUNK ###: {chunk}")
+        self.callback(token)
 
 
 class ModelType(Enum):
@@ -235,7 +241,7 @@ class ModelType(Enum):
             model_type = ModelType.Midjourney
         elif "azure" in model_name_lower or "api" in model_name_lower:
             model_type = ModelType.LangchainChat
-        elif "星火大模型" in model_name_lower:
+        elif "讯飞星火" in model_name_lower:
             model_type = ModelType.Spark
         elif "claude" in model_name_lower:
             model_type = ModelType.Claude
@@ -305,6 +311,7 @@ class BaseLLMModel:
         self.system_prompt = config["system"]
         self.api_key = config["api_key"]
         self.api_host = config["api_host"]
+        self.stream = config["stream"]
 
         self.interrupted = False
         self.need_api_key = self.api_key is not None
@@ -325,6 +332,7 @@ class BaseLLMModel:
         self.default_frequency_penalty = config["frequency_penalty"]
         self.default_logit_bias = config["logit_bias"]
         self.default_user_identifier = user
+        self.default_stream = config["stream"]
 
         self.single_turn = self.default_single_turn
         self.temperature = self.default_temperature
@@ -343,6 +351,7 @@ class BaseLLMModel:
         self.count_model_name = ""
         self.input_amount = 0
         self.enc = tiktoken.get_encoding("cl100k_base")
+
 
 
     def get_answer_stream_iter(self):
@@ -719,7 +728,6 @@ class BaseLLMModel:
         self,
         inputs,
         chatbot,
-        stream=False,
         use_websearch=False,
         files=None,
         reply_language="中文",
@@ -810,7 +818,7 @@ class BaseLLMModel:
 
         start_time = time.time()
         try:
-            if stream:
+            if self.stream:
                 logging.debug("使用流式传输")
                 iter = self.stream_next_chatbot(
                     inputs,
@@ -871,7 +879,6 @@ class BaseLLMModel:
     def retry(
         self,
         chatbot,
-        stream=False,
         use_websearch=False,
         files=None,
         reply_language="中文",
@@ -897,7 +904,6 @@ class BaseLLMModel:
         iter = self.predict(
             inputs,
             chatbot,
-            stream=stream,
             use_websearch=use_websearch,
             files=files,
             reply_language=reply_language,
@@ -1000,6 +1006,10 @@ class BaseLLMModel:
         self.single_turn = new_single_turn
         self.auto_save()
 
+    def set_streaming(self, new_streaming):
+        self.stream = new_streaming
+        self.auto_save()
+
     def reset(self, remain_system_prompt=False):
         self.history = []
         self.all_token_counts = []
@@ -1021,6 +1031,7 @@ class BaseLLMModel:
         self.frequency_penalty = self.default_frequency_penalty
         self.logit_bias = self.default_logit_bias
         self.user_identifier = self.default_user_identifier
+        self.stream = self.default_stream
 
         return (
             [],
@@ -1038,6 +1049,7 @@ class BaseLLMModel:
             self.frequency_penalty,
             self.logit_bias,
             self.user_identifier,
+            self.stream
         )
 
     def delete_first_conversation(self):
@@ -1079,7 +1091,7 @@ class BaseLLMModel:
         )
         ####################################################总计费 
 
-    def rename_chat_history(self, filename, chatbot):
+    def rename_chat_history(self, filename):
         if filename == "":
             return gr.update()
         if not filename.endswith(".json"):
@@ -1096,50 +1108,65 @@ class BaseLLMModel:
         filename = os.path.basename(full_path)
 
         self.history_file_path = filename
-        save_file(filename, self, chatbot)
+        save_file(filename, self)
         return init_history_list(self.user_name)
 
     def auto_name_chat_history(
-        self, name_chat_method, user_question, chatbot, single_turn_checkbox
+        self, name_chat_method, user_question, single_turn_checkbox
     ):
         if len(self.history) == 2 and not single_turn_checkbox:
             user_question = self.history[0]["content"]
             if type(user_question) == list:
                 user_question = user_question[0]["text"]
             filename = replace_special_symbols(user_question)[:16] + ".json"
-            return self.rename_chat_history(filename, chatbot)
+            return self.rename_chat_history(filename)
         else:
             return gr.update()
 
     def auto_save(self, chatbot=None):
         if chatbot is not None:
-            save_file(self.history_file_path, self, chatbot)
+            save_file(self.history_file_path, self)
 
     def export_markdown(self, filename, chatbot):
         if filename == "":
             return
         if not filename.endswith(".md"):
             filename += ".md"
-        save_file(filename, self, chatbot)
+        save_file(filename, self)
+
+    def upload_chat_history(self, new_history_file_content=None):
+        logging.debug(f"{self.user_name} 加载对话历史中……")
+        if new_history_file_content is not None:
+            if isinstance(new_history_file_content, bytes):
+                try:
+                    # Try to parse the content as JSON
+                    json_content = json.loads(new_history_file_content.decode('utf-8'))
+
+                    # If successful, save the content to a file
+                    new_history_filename = new_auto_history_filename(self.user_name)
+                    new_history_file_path = os.path.join(HISTORY_DIR, self.user_name, new_history_filename)
+
+                    # Ensure the directory exists
+                    os.makedirs(os.path.dirname(new_history_file_path), exist_ok=True)
+
+                    # Write the content to the file
+                    with open(new_history_file_path, 'w', encoding='utf-8') as f:
+                        json.dump(json_content, f, ensure_ascii=False, indent=2)
+
+                    self.history_file_path = new_history_filename[:-5]
+                    save_md_file(os.path.join(HISTORY_DIR, self.user_name, new_history_filename))
+                    logging.info(f"History file uploaded and saved as {self.history_file_path}")
+                except json.JSONDecodeError:
+                    logging.error("Uploaded content is not valid JSON. Using default history.")
+            else:
+                logging.warning("Unexpected type for new_history_file_content. Using default history.")
+        return *self.load_chat_history(), init_history_list(self.user_name)
 
     def load_chat_history(self, new_history_file_path=None):
         self.user_name = self.user_identifier
         logging.debug(f"{self.user_name} 加载对话历史中……")
         if new_history_file_path is not None:
-            if type(new_history_file_path) != str:
-                # copy file from new_history_file_path.name to os.path.join(HISTORY_DIR, self.user_name)
-                new_history_file_path = new_history_file_path.name
-                shutil.copyfile(
-                    new_history_file_path,
-                    os.path.join(
-                        HISTORY_DIR,
-                        self.user_name,
-                        os.path.basename(new_history_file_path),
-                    ),
-                )
-                self.history_file_path = os.path.basename(new_history_file_path)
-            else:
-                self.history_file_path = new_history_file_path
+            self.history_file_path = new_history_file_path
         try:
             if self.history_file_path == os.path.basename(self.history_file_path):
                 history_file_path = os.path.join(
@@ -1170,6 +1197,9 @@ class BaseLLMModel:
                     -len(saved_json["chatbot"]) :
                 ]
                 logging.info(f"Trimmed history: {saved_json['history']}")
+
+            # Sanitize chatbot
+            saved_json["chatbot"] = remove_html_tags(saved_json["chatbot"])
             logging.debug(f"{self.user_name} 加载对话历史完毕")
             self.history = saved_json["history"]
             self.single_turn = saved_json.get("single_turn", self.single_turn)
@@ -1192,7 +1222,13 @@ class BaseLLMModel:
             self.logit_bias = saved_json.get("logit_bias", self.logit_bias)
             self.user_identifier = saved_json.get("user_identifier", self.user_name)
             self.metadata = saved_json.get("metadata", self.metadata)
+            self.stream = saved_json.get("stream", self.stream)
             self.chatbot = saved_json["chatbot"]
+
+            history_json_path = os.path.realpath(os.path.join(HISTORY_DIR, self.user_name, self.history_file_path + ".json"))
+            history_md_path = os.path.realpath(os.path.join(HISTORY_DIR, self.user_name, self.history_file_path + ".md"))
+            tmp_json_for_download = save_file_to_cache(history_json_path, GRADIO_CACHE)
+            tmp_md_for_download = save_file_to_cache(history_md_path, GRADIO_CACHE)
             return (
                 os.path.basename(self.history_file_path)[:-5],
                 saved_json["system"],
@@ -1208,10 +1244,13 @@ class BaseLLMModel:
                 self.frequency_penalty,
                 self.logit_bias,
                 self.user_identifier,
+                self.stream,
+                gr.DownloadButton(value=tmp_json_for_download, interactive=True),
+                gr.DownloadButton(value=tmp_md_for_download, interactive=True),
             )
         except:
             # 没有对话历史或者对话历史解析失败
-            logging.info(f"没有找到对话历史记录 {self.history_file_path}")
+            logging.debug(f"没有找到对话历史记录 {self.history_file_path}")
             self.reset()
             return (
                 os.path.basename(self.history_file_path),
@@ -1228,6 +1267,9 @@ class BaseLLMModel:
                 self.frequency_penalty,
                 self.logit_bias,
                 self.user_identifier,
+                self.stream,
+                gr.DownloadButton(value=None, interactive=False),
+                gr.DownloadButton(value=None, interactive=False),
             )
 
     def delete_chat_history(self, filename):
@@ -1244,6 +1286,13 @@ class BaseLLMModel:
         else:
             history_file_path = filename
         md_history_file_path = history_file_path[:-5] + ".md"
+        # check if history file path matches user_name
+        # if user access control is not enabled, user_name is empty, don't check
+        assert os.path.basename(os.path.dirname(history_file_path)) == self.user_name or self.user_name == ""
+        assert os.path.basename(os.path.dirname(md_history_file_path)) == self.user_name or self.user_name == ""
+        # check if history file path is in history directory
+        assert os.path.realpath(history_file_path).startswith(os.path.realpath(HISTORY_DIR))
+        assert os.path.realpath(md_history_file_path).startswith(os.path.realpath(HISTORY_DIR))
         try:
             os.remove(history_file_path)
             os.remove(md_history_file_path)

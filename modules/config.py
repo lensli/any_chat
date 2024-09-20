@@ -190,6 +190,7 @@ if multi_api_key:
     shared.state.set_api_key_queue(api_key_list)
 
 auth_list = config.get("users", [])  # 实际上是使用者的列表
+admin_list = config.get("admin_list", [])  # 管理员列表
 authflag = len(auth_list) > 0  # 是否开启认证的状态值，改为判断auth_list长度
 
 # 处理自定义的api_host，优先读环境变量的配置，如果存在则自动装配
@@ -321,7 +322,7 @@ if server_port is None:
 assert server_port is None or type(server_port) == int, "要求port设置为int类型"
 
 # 设置默认model
-default_model = config.get("default_model", "GPT3.5 Turbo")
+default_model = config.get("default_model", "GPT-4o-mini")
 try:
     if default_model in presets.MODELS:
         presets.DEFAULT_MODEL = presets.MODELS.index(default_model)

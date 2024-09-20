@@ -76,8 +76,8 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                                 historySearchTextbox = gr.Textbox(show_label=False, container=False, placeholder=i18n(
                                     "搜索（支持正则）..."), lines=1, elem_id="history-search-tb")
                             with gr.Column(min_width=52, scale=1, elem_id="gr-history-header-btns"):
-                                uploadFileBtn = gr.UploadButton(
-                                    interactive=True, label="", file_types=[".json"], elem_id="gr-history-upload-btn")
+                                uploadHistoryBtn = gr.UploadButton(
+                                    interactive=True, label="", file_types=[".json"], elem_id="gr-history-upload-btn", type="binary")
                                 historyRefreshBtn = gr.Button("", elem_id="gr-history-refresh-btn")
 
 
@@ -95,12 +95,6 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                             with gr.Column(min_width=42, scale=1):
                                 historyDeleteBtn = gr.Button(
                                     "🗑️", elem_id="gr-history-delete-btn")
-                            with gr.Column(min_width=42, scale=1):
-                                historyDownloadBtn = gr.Button(
-                                    "⏬", elem_id="gr-history-download-btn")
-                            with gr.Column(min_width=42, scale=1):
-                                historyMarkdownDownloadBtn = gr.Button(
-                                    "⤵️", elem_id="gr-history-mardown-download-btn")
                     with gr.Row(visible=False):
                         with gr.Column(scale=6):
                             saveFileName = gr.Textbox(
@@ -114,8 +108,10 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                         with gr.Column(scale=1):
                             renameHistoryBtn = gr.Button(
                                 i18n("💾 保存对话"), elem_id="gr-history-save-btn")
-                            exportMarkdownBtn = gr.Button(
-                                i18n("📝 导出为 Markdown"), elem_id="gr-markdown-export-btn")
+                            downloadHistoryJSONBtn = gr.DownloadButton(
+                                i18n("历史记录（JSON）"), elem_id="gr-history-download-json-btn")
+                            downloadHistoryMarkdownBtn = gr.DownloadButton(
+                                i18n("导出为 Markdown"), elem_id="gr-history-download-md-btn")
 
             with gr.Column(elem_id="chuanhu-menu-footer"):
                 with gr.Row(elem_id="chuanhu-func-nav"):
@@ -563,12 +559,13 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
         else:
 
             current_model.new_auto_history_filename()
-            loaded_stuff = [gr.update(), gr.update(), gr.Chatbot(label=MODELS[DEFAULT_MODEL]), current_model.single_turn, current_model.temperature, current_model.top_p, current_model.n_choices, current_model.stop_sequence, current_model.token_upper_limit, current_model.max_generation_token, current_model.presence_penalty, current_model.frequency_penalty, current_model.logit_bias, current_model.user_identifier]
+            loaded_stuff = [gr.update(), gr.update(), gr.Chatbot(label=MODELS[DEFAULT_MODEL]), current_model.single_turn, current_model.temperature, current_model.top_p, current_model.n_choices, current_model.stop_sequence, current_model.token_upper_limit, current_model.max_generation_token, current_model.presence_penalty, current_model.frequency_penalty, current_model.logit_bias, current_model.user_identifier, gr.DownloadButton(), gr.DownloadButton()]
         return user_info, user_name, current_model, toggle_like_btn_visibility(DEFAULT_MODEL), *loaded_stuff, init_history_list(user_name, prepend=current_model.history_file_path.rstrip(".json"))
 
     demo.load(create_greeting, inputs=None, outputs=[
-              user_info, user_name, current_model, like_dislike_area, saveFileName, systemPromptTxt, chatbot, single_turn_checkbox, temperature_slider, top_p_slider, n_choices_slider, stop_sequence_txt, max_context_length_slider, max_generation_slider, presence_penalty_slider, frequency_penalty_slider, logit_bias_txt, user_identifier_txt, historySelectList], api_name="load")
+              user_info, user_name, current_model, like_dislike_area, saveFileName, systemPromptTxt, chatbot, single_turn_checkbox, temperature_slider, top_p_slider, n_choices_slider, stop_sequence_txt, max_context_length_slider, max_generation_slider, presence_penalty_slider, frequency_penalty_slider, logit_bias_txt, user_identifier_txt, use_streaming_checkbox, downloadHistoryJSONBtn, downloadHistoryMarkdownBtn, historySelectList], api_name="load")
     #推理函数输入 输出
+
     chatgpt_predict_args = dict(
         fn=predict,
         inputs=[
@@ -576,7 +573,6 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
             current_model,
             user_question,
             chatbot,
-            use_streaming_checkbox,
             use_websearch_checkbox,
             index_files,
             language_select_dropdown,
@@ -617,7 +613,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
     load_history_from_file_args = dict(
         fn=load_chat_history,
         inputs=[current_model, historySelectList],
-        outputs=[saveFileName, systemPromptTxt, chatbot, single_turn_checkbox, temperature_slider, top_p_slider, n_choices_slider, stop_sequence_txt, max_context_length_slider, max_generation_slider, presence_penalty_slider, frequency_penalty_slider, logit_bias_txt, user_identifier_txt],
+        outputs=[saveFileName, systemPromptTxt, chatbot, single_turn_checkbox, temperature_slider, top_p_slider, n_choices_slider, stop_sequence_txt, max_context_length_slider, max_generation_slider, presence_penalty_slider, frequency_penalty_slider, logit_bias_txt, user_identifier_txt, use_streaming_checkbox, downloadHistoryJSONBtn, downloadHistoryMarkdownBtn],
     )
 
     refresh_history_args = dict(
@@ -626,7 +622,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
 
     auto_name_chat_history_args = dict(
         fn=auto_name_chat_history,
-        inputs=[current_model, name_chat_method, user_question, chatbot, single_turn_checkbox],
+        inputs=[current_model, name_chat_method, user_question, single_turn_checkbox],
         outputs=[historySelectList],
         show_progress=False,
     )
@@ -654,7 +650,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
     emptyBtn.click(
         reset,
         inputs=[current_model, retain_system_prompt_checkbox],
-        outputs=[chatbot, status_display, historySelectList, systemPromptTxt, single_turn_checkbox, temperature_slider, top_p_slider, n_choices_slider, stop_sequence_txt, max_context_length_slider, max_generation_slider, presence_penalty_slider, frequency_penalty_slider, logit_bias_txt, user_identifier_txt],
+        outputs=[chatbot, status_display, historySelectList, systemPromptTxt, single_turn_checkbox, temperature_slider, top_p_slider, n_choices_slider, stop_sequence_txt, max_context_length_slider, max_generation_slider, presence_penalty_slider, frequency_penalty_slider, logit_bias_txt, user_identifier_txt, use_streaming_checkbox],
         show_progress=True,
         js='(a,b)=>{return clearChatbot(a,b);}',
     )
@@ -664,7 +660,6 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
         [
             current_model,
             chatbot,
-            use_streaming_checkbox,
             use_websearch_checkbox,
             index_files,
             language_select_dropdown,
@@ -709,9 +704,11 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
     keyTxt.submit(**get_usage_args)
     single_turn_checkbox.change(
         set_single_turn, [current_model, single_turn_checkbox], None, show_progress=False)
-    
+
+    use_streaming_checkbox.change(set_streaming, [current_model, use_streaming_checkbox], None, show_progress=False)
+
     model_select_dropdown.change(get_model, [model_select_dropdown, lora_select_dropdown, user_api_key, temperature_slider, top_p_slider, systemPromptTxt, user_name, current_model], [
-                                 current_model, status_display, chatbot, lora_select_dropdown, user_api_key, keyTxt, modelDescription], show_progress=True, api_name="get_model")
+                                 current_model, status_display, chatbot, lora_select_dropdown, user_api_key, keyTxt, modelDescription, use_streaming_checkbox], show_progress=True, api_name="get_model")
     model_select_dropdown.change(toggle_like_btn_visibility, [model_select_dropdown], [
                                  like_dislike_area], show_progress=False)
     # model_select_dropdown.change(
@@ -740,16 +737,10 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
     # S&L
     renameHistoryBtn.click(
         rename_chat_history,
-        [current_model, saveFileName, chatbot],
+        [current_model, saveFileName],
         [historySelectList],
         show_progress=True,
         js='(a,b,c,d)=>{return saveChatHistory(a,b,c,d);}'
-    )
-    exportMarkdownBtn.click(
-        export_markdown,
-        [current_model, saveFileName, chatbot],
-        [],
-        show_progress=True,
     )
     historyRefreshBtn.click(**refresh_history_args)
     historyDeleteBtn.click(delete_chat_history, [current_model, historySelectList], [status_display, historySelectList, chatbot], js='(a,b,c)=>{return showConfirmationDialog(a, b, c);}').then(
@@ -760,12 +751,8 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
         js='(a,b)=>{return clearChatbot(a,b);}',
     )
     historySelectList.select(**load_history_from_file_args)
-    uploadFileBtn.upload(upload_chat_history, [current_model, uploadFileBtn], [
-                        saveFileName, systemPromptTxt, chatbot, single_turn_checkbox, temperature_slider, top_p_slider, n_choices_slider, stop_sequence_txt, max_context_length_slider, max_generation_slider, presence_penalty_slider, frequency_penalty_slider, logit_bias_txt, user_identifier_txt]).then(**refresh_history_args)
-    historyDownloadBtn.click(None, [
-                             user_name, historySelectList], None, js='(a,b)=>{return downloadHistory(a,b,".json");}')
-    historyMarkdownDownloadBtn.click(None, [
-                                     user_name, historySelectList], None, js='(a,b)=>{return downloadHistory(a,b,".md");}')
+    uploadHistoryBtn.upload(upload_chat_history, [current_model, uploadHistoryBtn], [
+                        saveFileName, systemPromptTxt, chatbot, single_turn_checkbox, temperature_slider, top_p_slider, n_choices_slider, stop_sequence_txt, max_context_length_slider, max_generation_slider, presence_penalty_slider, frequency_penalty_slider, logit_bias_txt, user_identifier_txt, use_streaming_checkbox, downloadHistoryJSONBtn, downloadHistoryMarkdownBtn, historySelectList]).then(**refresh_history_args)
     historySearchTextbox.input(
         filter_history,
         [user_name, historySearchTextbox],
@@ -833,7 +820,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
     # Invisible elements
     updateChuanhuBtn.click(
         update_chuanhu,
-        [],
+        [user_name],
         [status_display],
         show_progress=True,
     )
@@ -859,7 +846,7 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
     historySelectBtn.click(  # This is an experimental feature... Not actually used.
         fn=load_chat_history,
         inputs=[current_model, historySelectList],
-        outputs=[saveFileName, systemPromptTxt, chatbot, single_turn_checkbox, temperature_slider, top_p_slider, n_choices_slider, stop_sequence_txt, max_context_length_slider, max_generation_slider, presence_penalty_slider, frequency_penalty_slider, logit_bias_txt, user_identifier_txt],
+        outputs=[saveFileName, systemPromptTxt, chatbot, single_turn_checkbox, temperature_slider, top_p_slider, n_choices_slider, stop_sequence_txt, max_context_length_slider, max_generation_slider, presence_penalty_slider, frequency_penalty_slider, logit_bias_txt, user_identifier_txt, use_streaming_checkbox, downloadHistoryJSONBtn, downloadHistoryMarkdownBtn],
         js='(a,b)=>{return bgSelectHistory(a,b);}'
     )
 # 默认开启本地服务器，默认可以直接从IP访问，默认不创建公开分享链接
@@ -870,9 +857,8 @@ if __name__ == "__main__":
     setup_wizard()
     #concurrency_count=CONCURRENT_COUNT
     demo.queue().launch(
-
-        allowed_paths=["history", "web_assets"],
-        blocked_paths=["config.json", "files", "models", "lora", "modules"],
+        allowed_paths=["web_assets"],
+        blocked_paths=["config.json", "files", "models", "lora", "modules", "history"],
         server_name=server_name,
         server_port=server_port,
         share=share,
