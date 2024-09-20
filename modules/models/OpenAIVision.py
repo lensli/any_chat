@@ -55,6 +55,7 @@ class OpenAIVisionClient(BaseLLMModel):
                     partial_text += ''.join(batch)
                     batch.clear()
                     yield partial_text
+            yield partial_text
             return
         response = self._get_response(stream=True)
         if response is not None:
@@ -68,6 +69,7 @@ class OpenAIVisionClient(BaseLLMModel):
                     partial_text += ''.join(batch)
                     batch.clear()
                     yield partial_text
+            yield partial_text
         else:
             yield STANDARD_ERROR_MSG + GENERAL_ERROR_MSG
 
