@@ -461,9 +461,10 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
                         )
 
                     with gr.Tab(label=i18n("关于"), elem_id="about-tab"):
-                        gr.Markdown(
-                            f'<img alt="Chuanhu Chat logo" src="file={any_icon_512}" style="max-width: 144px;">')
-                        # gr.Markdown("# "+i18n(logo_name))
+                        pass
+                        # gr.Markdown(
+                        #     f'<img alt="Chuanhu Chat logo" src="file://{any_icon_512}" style="max-width: 144px;">')
+                        gr.Markdown("# "+i18n(logo_name))
                         # gr.HTML(get_html("footer.html").format(
                         #     versions=versions_html()), elem_id="footer")
                         # gr.Markdown(CHUANHU_DESCRIPTION, elem_id="description")
@@ -569,7 +570,6 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
     chatgpt_predict_args = dict(
         fn=predict,
         inputs=[
-            
             current_model,
             user_question,
             chatbot,
@@ -578,7 +578,6 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
             language_select_dropdown,
             user_name,
             model_select_dropdown,
-
         ],
         outputs=[chatbot, status_display],
         show_progress=True,

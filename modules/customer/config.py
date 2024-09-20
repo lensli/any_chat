@@ -1,14 +1,22 @@
-import json
+import json,os,sys
 
 any = ""
+
+
+# 获取项目根目录
+def get_project_root():
+    current_file_path = os.path.abspath(__file__)
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_file_path)))  # 根据具体的层级关系修改
+    return project_root
+
+# 动态绝对路径
+project_root = get_project_root()
 logo_name = "多模态大模型"
-logo_favicon_path = "modules/customer/dlm/favicon.ico"
-
-
-any_icon_512 = "modules/customer/dlm/any-icon-512.png"
-mask_icon_512 = "modules/customer/dlm/mask-icon-512.png"
-bot_avatar_path = "modules/customer/dlm/robot-256.png"
-user_avatar_path = "modules/customer/dlm/user_256.png"
+logo_favicon_path = os.path.join(project_root, "modules", "customer", "dlm", "favicon.ico")
+any_icon_512 = os.path.join(project_root, "modules", "customer", "dlm", "any-icon-512.png")
+mask_icon_512 = os.path.join(project_root, "modules", "customer", "dlm", "mask-icon-512.png")
+bot_avatar_path = os.path.join(project_root, "modules", "customer", "dlm", "robot-256.png")
+user_avatar_path = os.path.join(project_root, "modules", "customer", "dlm", "user_256.png")
 
 coin_name = "金币"
 

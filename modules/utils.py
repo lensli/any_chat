@@ -41,7 +41,7 @@ if TYPE_CHECKING:
 #发送按钮调用预测
 def predict(current_model,request: gr.Request,user_question,
             chatbot,
-            use_streaming_checkbox,
+            # use_streaming_checkbox,
             use_websearch_checkbox,
             index_files,
             language_select_dropdown,
@@ -65,7 +65,7 @@ def predict(current_model,request: gr.Request,user_question,
         yield "","请刷新网页重新登录"
     iter = current_model.predict(user_question,
             chatbot,
-            use_streaming_checkbox,
+            # use_streaming_checkbox,
             use_websearch_checkbox,
             index_files,
             language_select_dropdown,
@@ -448,7 +448,8 @@ def construct_assistant(text):
 def save_file(filename, model):
     system = model.system_prompt
     history = model.history
-    chatbot = [(history[i]["content"], history[i + 1]["content"]) for i in range(0, len(history), 2)]
+    # chatbot = [(history[i]["content"], history[i + 1]["content"]) for i in range(0, len(history), 2)]
+    chatbot = [(history[i]["content"], history[i + 1]["content"]) if i + 1 < len(history) else (history[i]["content"], None) for i in range(0, len(history), 2)]
     user_name = model.user_name
     os.makedirs(os.path.join(HISTORY_DIR, user_name), exist_ok=True)
     if filename is None:
