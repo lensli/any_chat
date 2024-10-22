@@ -535,6 +535,7 @@ class BaseLLMModel:
         self.ouput_amount = get_deduction_amount(status_text,self.count_model_name,"output")
         udb = User_Db()
         udb.deduct_balance(self.user_name,self.ouput_amount)
+        result = udb.get_user_info(self.user_name)
         status_text = (f"消费{int((self.ouput_amount+self.input_amount)*1000)}{coin_name},剩余{int((result[1]-result[0])*1000)}{coin_name}")
         udb.__del__()
 

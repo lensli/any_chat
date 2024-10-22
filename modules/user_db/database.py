@@ -90,6 +90,10 @@ def get_deduction_amount(txt,model_name,mode):
         deduction_tables = {
             "GPT3.5 Turbo":0.036,
             "GPT3.5 Turbo 16K":0.02,
+            '问答模型4o':0.3,
+            '问答模型o1-pre':1.8,
+            '问答模型o1-mini':0.5,
+            '生图模型de3':6,
             # "GPT4",
             # "GPT4 32K",
             # "GPT4 Turbo",
@@ -113,6 +117,10 @@ def get_deduction_amount(txt,model_name,mode):
         deduction_tables = {
         "GPT3.5 Turbo":0.036,
         "GPT3.5 Turbo 16K":0.02,
+        '问答模型4o':0.3,
+        '问答模型o1-pre':1.8,
+        '问答模型o1-mini':0.5,
+        '生图模型de3':6,
         # "GPT4",
         # "GPT4 32K",
         # "GPT4 Turbo",
@@ -131,6 +139,8 @@ def get_deduction_amount(txt,model_name,mode):
         # "chatglm3-6b",
         # "chatglm3-6b-32k",
         }
+    
+    
     return len(txt)/500 *deduction_tables.get(model_name,0.3)
 
 class User_Db:
