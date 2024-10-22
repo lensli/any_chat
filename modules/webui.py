@@ -33,6 +33,8 @@ def javascript_html():
         head += f'<script type="text/javascript" src="{webpath(script.path)}"></script>\n'
     for script in list_scripts("javascript", ".mjs"):
         head += f'<script type="module" src="{webpath(script.path)}"></script>\n'
+    for script in list_scripts("css", ".css"):
+        head += f'<script type="module" src="{webpath(script.path)}"></script>\n'
     return head
 
 def css_html():
@@ -53,9 +55,10 @@ def list_scripts(scriptdirname, extension):
 
 def reload_javascript():
     js = javascript_html()
-    js += '<script async type="module" src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>'
-    js += '<script async type="module" src="https://spin.js.org/spin.umd.js"></script><link type="text/css" href="https://spin.js.org/spin.css" rel="stylesheet" />'
-    js += '<script async src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />'
+    # js += '<script async type="module" src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>'
+    # js += '<script async type="module" src="https://spin.js.org/spin.umd.js"></script><link type="text/css" href="https://spin.js.org/spin.css" rel="stylesheet" />'
+    # js += '<script async src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />'
+
     
     meta = """
         <meta name="apple-mobile-web-app-title" content="川虎 Chat">

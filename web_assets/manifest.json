@@ -7,13 +7,13 @@
     "start_url": "/",
     "icons": [
         {
-            "src": "/file=C:\\home\\shared\\any_chat\\modules\\customer\\dlm\\any-icon-512.png",
+            "src": "/file=c:\\home\\shared\\any_chat\\modules\\customer\\dlm\\any-icon-512.png",
             "type": "image/png",
             "sizes": "512x512",
             "purpose": "maskable"
         },
         {
-            "src": "/file=C:\\home\\shared\\any_chat\\modules\\customer\\dlm\\mask-icon-512.png",
+            "src": "/file=c:\\home\\shared\\any_chat\\modules\\customer\\dlm\\mask-icon-512.png",
             "type": "image/png",
             "sizes": "512x512",
             "purpose": "any"
