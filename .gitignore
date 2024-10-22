@@ -157,3 +157,5 @@ create_release.sh
 frp/*
 modules/user_db/user.db
 *.db
+python*
+venv_software/*

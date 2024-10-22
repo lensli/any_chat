@@ -1,6 +1,7 @@
 import PyPDF2
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
+
 from langchain_openai import OpenAIEmbeddings, AzureOpenAIEmbeddings
 from tqdm import tqdm
 
