@@ -522,7 +522,7 @@ def get_file_names_by_type(dir, filetypes=[".json"]):
     files = []
     for type in filetypes:
         files += [f for f in os.listdir(dir) if f.endswith(type)]
-    logging.debug(f"files are:{files}")
+    logging.debug(f"files are:{len(files)}")
     return files
 
 
@@ -530,7 +530,7 @@ def get_file_names_by_pinyin(dir, filetypes=[".json"]):
     files = get_file_names_by_type(dir, filetypes)
     if files != [""]:
         files = sorted_by_pinyin(files)
-    logging.debug(f"files are:{files}")
+    logging.debug(f"files are:{len(files)}")
     return files
 
 
@@ -543,7 +543,7 @@ def get_file_names_by_last_modified_time(dir, filetypes=[".json"]):
     files = get_file_names_by_type(dir, filetypes)
     if files != [""]:
         files = sorted_by_last_modified_time(files, dir)
-    logging.debug(f"files are:{files}")
+    logging.debug(f"files are:{len(files)}")
     return files
 
 

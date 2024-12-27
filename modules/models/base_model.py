@@ -193,7 +193,7 @@ class ModelType(Enum):
         if "跳舞模型" in model_name_lower:
             model_type = ModelType.Dance
             return model_type
-        if model_name_lower  in "问答模型3.5,问答模型4.0 turbo,问答模型4.0,问答模型4o,问答模型4o-mini,问答模型o1-pre,问答模型o1-mini":
+        if model_name_lower  in "问答模型3.5,问答模型4.0 turbo,问答模型4.0,问答模型4o,问答模型4o-mini,问答模型o1-pre,问答模型o1-mini,问答模型o1,问答模型4o-online":
             model_type = ModelType.OpenAI
             return model_type
         if model_name_lower in "图像对话模型4v(不能生图)":
@@ -480,6 +480,7 @@ class BaseLLMModel:
         partial_text = ""
         token_increment = 1
         for partial_text in stream_iter:
+            print(f"Received partial_text: {partial_text}")
             if type(partial_text) == tuple:
                 partial_text, token_increment = partial_text
 
@@ -1165,7 +1166,9 @@ class BaseLLMModel:
 
     def load_chat_history(self, new_history_file_path=None):
         self.user_name = self.user_identifier
+
         logging.debug(f"{self.user_name} 加载对话历史中……")
+
         if new_history_file_path is not None:
             self.history_file_path = new_history_file_path
         try:
@@ -1249,8 +1252,12 @@ class BaseLLMModel:
                 gr.DownloadButton(value=tmp_json_for_download, interactive=True),
                 gr.DownloadButton(value=tmp_md_for_download, interactive=True),
             )
-        except:
+
+
+        except Exception as e:
+
             # 没有对话历史或者对话历史解析失败
+            logging.debug(f"{e}")
             logging.debug(f"没有找到对话历史记录 {self.history_file_path}")
             self.reset()
             return (

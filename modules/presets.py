@@ -57,9 +57,11 @@ CHUANHU_DESCRIPTION = i18n("")
 ONLINE_MODELS = [
     "问答模型4o",
     "问答模型4o-mini",
+    "问答模型4o-online",
     "问答模型o1-pre",
     "问答模型o1-mini",
     "生图模型de3",#DALL-E 3",
+    "问答模型o1",
     # "唱歌模型_v3",
     # "视频模型",
     # "跳舞模型",
@@ -142,6 +144,18 @@ DEFAULT_METADATA = {
 MODEL_METADATA = {
     # "问答模型o1-pre",
     # "问答模型o1-mini",
+    "问答模型o1": {
+        "model_name": "o1",
+        "description": "o1 正式版",
+        "token_limit": 128000,
+        "multimodal": True,
+        # "model_type": "OpenAIVision",
+        "stream": True,
+        "placeholder": {
+            "logo": "file=web_assets/model_logos/openai-black.webp",
+            "slogan": i18n("gpt_default_slogan"),
+        }
+    },
     "问答模型o1-pre": {
         "model_name": "o1-preview",
         "description": "o1-preview_description",
@@ -187,6 +201,18 @@ MODEL_METADATA = {
             "slogan": i18n("gpt_default_slogan"),
         }
     },
+    "问答模型4o-online":{
+        "model_name": "gpt-4o-all",
+        "description": "gpt4o-all 网络版",
+
+        "token_limit": 128000,
+        "multimodal": True,
+        "placeholder": {
+            "logo": "file=web_assets/model_logos/openai-green.webp",
+            "slogan": i18n("gpt_default_slogan"),
+        }
+    },
+
     "问答模型4o":{
         "model_name": "gpt-4o",
         "description": "gpt4o_description",

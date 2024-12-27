@@ -5,7 +5,7 @@ sys.path.insert(0,os.path.dirname(__file__))
 
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] [%(filename)s:%(lineno)d] %(message)s",
 )
 

@@ -22,6 +22,7 @@ from ..utils import *
 from .base_model import BaseLLMModel
 
 
+
 class OpenAIVisionClient(BaseLLMModel):
     def __init__(
         self,
@@ -37,9 +38,19 @@ class OpenAIVisionClient(BaseLLMModel):
             }
         )
         if self.api_host is not None:
-            self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(self.api_host)
+            duoduo_api = "https://aigcbest.top/"
+            if model_name in "问答模型o1,问答模型4o-online":
+                self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(duoduo_api)
+                self.api_key = "sk-S4P3HS25sTHolaI0g2eW6UCL15lCTYqvvENzNA2FyKaKJxKj"
+            else:
+                self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(self.api_host)
         else:
-            self.api_host, self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.state.api_host, shared.state.chat_completion_url, shared.state.images_completion_url, shared.state.openai_api_base, shared.state.balance_api_url, shared.state.usage_api_url
+            duoduo_api = "https://aigcbest.top/"
+            if model_name in "问答模型o1,问答模型4o-online":
+                self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(duoduo_api)
+                self.api_key = "sk-S4P3HS25sTHolaI0g2eW6UCL15lCTYqvvENzNA2FyKaKJxKj"
+            else:
+                self.api_host, self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.state.api_host, shared.state.chat_completion_url, shared.state.images_completion_url, shared.state.openai_api_base, shared.state.balance_api_url, shared.state.usage_api_url
         self._refresh_header()
 
     def get_answer_stream_iter(self):
@@ -62,13 +73,14 @@ class OpenAIVisionClient(BaseLLMModel):
             iter = self._decode_chat_response(response)
             partial_text = ""
             batch = []
-            batch_size = 10 
+            batch_size = 10
             for i in iter:
                 batch.append(i)
                 if len(batch) >= batch_size:
                     partial_text += ''.join(batch)
                     batch.clear()
                     yield partial_text
+            partial_text += ''.join(batch)
             yield partial_text
         else:
             yield STANDARD_ERROR_MSG + GENERAL_ERROR_MSG
@@ -170,6 +182,7 @@ class OpenAIVisionClient(BaseLLMModel):
 
     @shared.state.switching_api_key  # 在不开启多账号模式的时候，这个装饰器不会起作用
     def _get_response(self, stream=False):
+
         openai_api_key = self.api_key
         system_prompt = self.system_prompt
         history = self._get_gpt4v_style_history()
@@ -180,6 +193,7 @@ class OpenAIVisionClient(BaseLLMModel):
             "Content-Type": "application/json",
             "Authorization": f"Bearer {openai_api_key}",
         }
+
         # "问答模型o1-pre",
         # "问答模型o1-mini",
 
@@ -258,8 +272,53 @@ class OpenAIVisionClient(BaseLLMModel):
             raise Exception(
                 f"API request failed with status code {response.status_code}: {response.text}"
             )
-
     def _decode_chat_response(self, response):
+        error_msg = ""
+        for chunk in response.iter_lines():
+            if not chunk:
+                continue  # 跳过空行
+
+            try:
+                chunk_str = chunk.decode('utf-8')  # 解码为字符串
+            except UnicodeDecodeError as e:
+                logging.error(f"解码错误: {e}，原始数据: {chunk}")
+                error_msg += chunk.decode('utf-8', errors='ignore')
+                continue
+
+            if chunk_str.startswith("data: "):
+                data_str = chunk_str[len("data: "):]
+                if data_str == "[DONE]":
+                    break  # 结束标志
+                try:
+                    chunk_json = json.loads(data_str)
+                except json.JSONDecodeError as e:
+                    logging.error(f"JSON解析错误: {e}，数据: {data_str}")
+                    error_msg += data_str
+                    continue
+
+                try:
+                    model = chunk_json.get("model", "")
+                    if model == "gpt-4o-all":
+                        # 专门处理 gpt-4o-all 模型的响应
+                        content = chunk_json["choices"][0]["delta"].get("content", "")
+                        if content:
+                            yield content
+                    else:
+                        # 处理其他模型的响应
+                        delta = chunk_json["choices"][0]["delta"]
+                        content = delta.get("content", "")
+                        if content:
+                            yield content
+                except KeyError as e:
+                    logging.error(f"解析 JSON 时缺少键: {e}，完整数据: {chunk_json}")
+                    continue
+            else:
+                logging.warning(f"收到未知格式的数据: {chunk_str}")
+                continue
+
+        if error_msg and error_msg != "[DONE]":
+            raise Exception(error_msg)
+    def _decode_chat_response_ssssssssssssssssss(self, response):
         error_msg = ""
         for chunk in response.iter_lines():
             if chunk:
@@ -272,20 +331,30 @@ class OpenAIVisionClient(BaseLLMModel):
                     error_msg += chunk
                     continue
                 try:
-                    if chunk_length > 6 and "delta" in chunk["choices"][0]:
-                        if "finish_details" in chunk["choices"][0]:
-                            finish_reason = chunk["choices"][0]["finish_details"]
-                        elif "finish_reason" in chunk["choices"][0]:
-                            finish_reason = chunk["choices"][0]["finish_reason"]
-                        else:
-                            finish_reason = chunk["finish_details"]
-                        if finish_reason == "stop":
-                            break
+                    if chunk.get("model",None) in "gpt-4o-all":
                         try:
-                            yield chunk["choices"][0]["delta"]["content"]
+                            data = chunk["choices"][0]["delta"]["content"]
+                            yield data
+
                         except Exception as e:
                             # logging.error(f"Error: {e}")
                             continue
+                        
+                    else:    
+                        if chunk_length > 6 and "delta" in chunk["choices"][0]:
+                            if "finish_details" in chunk["choices"][0]:
+                                finish_reason = chunk["choices"][0]["finish_details"]
+                            elif "finish_reason" in chunk["choices"][0]:
+                                finish_reason = chunk["choices"][0]["finish_reason"]
+                            else:
+                                finish_reason = chunk["finish_details"]
+                            if finish_reason == "stop":
+                                break
+                            try:
+                                yield chunk["choices"][0]["delta"]["content"]
+                            except Exception as e:
+                                # logging.error(f"Error: {e}")
+                                continue
                 except:
                     traceback.print_exc()
                     print(f"ERROR: {chunk}")
