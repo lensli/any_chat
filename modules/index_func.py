@@ -145,9 +145,10 @@ def construct_index(
     index_name = get_file_hash(file_src)
     index_path = f"./index/{index_name}"
     if local_embedding:
-        embeddings = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/distiluse-base-multilingual-cased-v2"
-        )
+        pass
+        # embeddings = HuggingFaceEmbeddings(
+        #     model_name="sentence-transformers/distiluse-base-multilingual-cased-v2"
+        # )
     else:
         if os.environ.get("OPENAI_API_TYPE", "openai") == "openai":
             embeddings = OpenAIEmbeddings(

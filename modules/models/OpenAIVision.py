@@ -37,18 +37,26 @@ class OpenAIVisionClient(BaseLLMModel):
                 "api_key": api_key
             }
         )
+        duoduo_api = "https://aigcbest.top/"
+        deepseek_api = "https://aigcbest.top/"
         if self.api_host is not None:
-            duoduo_api = "https://aigcbest.top/"
+
             if model_name in "问答模型o1,问答模型4o-online":
                 self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(duoduo_api)
                 self.api_key = "sk-S4P3HS25sTHolaI0g2eW6UCL15lCTYqvvENzNA2FyKaKJxKj"
+            elif model_name in "deepseekv3,deepseek-reasoner":
+                self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(deepseek_api)
+                self.api_key = "sk-aBzeENtwImZMqX1JwODpE04wSxObU1bj3ZNZMM28T5V6wGvd"
             else:
                 self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(self.api_host)
         else:
-            duoduo_api = "https://aigcbest.top/"
             if model_name in "问答模型o1,问答模型4o-online":
                 self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(duoduo_api)
                 self.api_key = "sk-S4P3HS25sTHolaI0g2eW6UCL15lCTYqvvENzNA2FyKaKJxKj"
+            elif model_name in "deepseekv3,deepseek-reasoner":
+                self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(deepseek_api)
+                self.api_key = "sk-aBzeENtwImZMqX1JwODpE04wSxObU1bj3ZNZMM28T5V6wGvd"
+                
             else:
                 self.api_host, self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.state.api_host, shared.state.chat_completion_url, shared.state.images_completion_url, shared.state.openai_api_base, shared.state.balance_api_url, shared.state.usage_api_url
         self._refresh_header()
@@ -305,8 +313,12 @@ class OpenAIVisionClient(BaseLLMModel):
                             yield content
                     else:
                         # 处理其他模型的响应
-                        delta = chunk_json["choices"][0]["delta"]
-                        content = delta.get("content", "")
+                        try:
+                            delta = chunk_json["choices"][0]["delta"]
+                            content = delta.get("content", "")
+                        except Exception as e:
+                            content = ""
+
                         if content:
                             yield content
                 except KeyError as e:

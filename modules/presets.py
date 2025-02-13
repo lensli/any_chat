@@ -55,13 +55,17 @@ CHUANHU_DESCRIPTION = i18n("")
 
 
 ONLINE_MODELS = [
-    "问答模型4o",
-    "问答模型4o-mini",
     "问答模型4o-online",
+    "问答模型4o",
+    "deepseekv3",
+    "deepseek-reasoner",
+    "问答模型4o-mini",
     "问答模型o1-pre",
     "问答模型o1-mini",
     "生图模型de3",#DALL-E 3",
     "问答模型o1",
+    # "问答模型o1",
+    # "问答模型o1",
     # "唱歌模型_v3",
     # "视频模型",
     # "跳舞模型",
@@ -216,6 +220,29 @@ MODEL_METADATA = {
     "问答模型4o":{
         "model_name": "gpt-4o",
         "description": "gpt4o_description",
+
+        "token_limit": 128000,
+        "multimodal": True,
+        "placeholder": {
+            "logo": "file=web_assets/model_logos/openai-green.webp",
+            "slogan": i18n("gpt_default_slogan"),
+        }
+    },
+
+    "deepseekv3":{
+        "model_name": "deepseek-chat",
+        "description": "gpt4o_description",
+
+        "token_limit": 128000,
+        "multimodal": True,
+        "placeholder": {
+            "logo": "file=web_assets/model_logos/openai-green.webp",
+            "slogan": i18n("gpt_default_slogan"),
+        }
+    },
+    "deepseek-reasoner":{
+        "model_name": "deepseek-reasoner",
+        "description": "deepseek-reasoner",
 
         "token_limit": 128000,
         "multimodal": True,

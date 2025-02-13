@@ -190,6 +190,7 @@ def handle_file_upload(current_model, *args):
 
 
 def handle_summarize_index(current_model, *args):
+    breakpoint()
     return current_model.summarize_index(*args)
 
 
