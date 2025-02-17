@@ -28,14 +28,26 @@ HISTORY_DIR = "history"
 TEMPLATES_DIR = "templates"
 
 # 错误信息
+# STANDARD_ERROR_MSG = i18n("☹️发生了错误：")  # 错误信息的标准前缀
+# GENERAL_ERROR_MSG = i18n("获取对话时发生错误，请查看后台日志")
+# ERROR_RETRIEVE_MSG = i18n("请检查网络连接，或者API-Key是否有效。")
+# CONNECTION_TIMEOUT_MSG = i18n("连接超时，无法获取对话。")  # 连接超时
+# READ_TIMEOUT_MSG = i18n("读取超时，无法获取对话。")  # 读取超时
+# PROXY_ERROR_MSG = i18n("代理错误，无法获取对话。")  # 代理错误
+# SSL_ERROR_PROMPT = i18n("SSL错误，无法获取对话。")  # SSL 错误
+# NO_APIKEY_MSG = i18n("API key为空，请检查是否输入正确。")  # API key 长度不足 51 位
+
 STANDARD_ERROR_MSG = i18n("☹️发生了错误：")  # 错误信息的标准前缀
-GENERAL_ERROR_MSG = i18n("获取对话时发生错误，请查看后台日志")
-ERROR_RETRIEVE_MSG = i18n("请检查网络连接，或者API-Key是否有效。")
-CONNECTION_TIMEOUT_MSG = i18n("连接超时，无法获取对话。")  # 连接超时
-READ_TIMEOUT_MSG = i18n("读取超时，无法获取对话。")  # 读取超时
-PROXY_ERROR_MSG = i18n("代理错误，无法获取对话。")  # 代理错误
-SSL_ERROR_PROMPT = i18n("SSL错误，无法获取对话。")  # SSL 错误
-NO_APIKEY_MSG = i18n("API key为空，请检查是否输入正确。")  # API key 长度不足 51 位
+GENERAL_ERROR_MSG = i18n("获取对话时发生错误，请重试")
+ERROR_RETRIEVE_MSG = i18n("网络错误,请重试 ")
+CONNECTION_TIMEOUT_MSG = i18n("连接超时，请重试")  # 连接超时
+READ_TIMEOUT_MSG = i18n("读取超时，请重试")  # 读取超时
+PROXY_ERROR_MSG = i18n("网络集群错误，请重试。")  # 代理错误
+SSL_ERROR_PROMPT = i18n("SSL错误，请重试。")  # SSL 错误
+NO_APIKEY_MSG = i18n("秘钥验证错误，请重试。")  # API key 长度不足 51 位
+
+
+
 NO_INPUT_MSG = i18n("请输入对话内容。")  # 未输入对话内容
 BILLING_NOT_APPLICABLE_MSG = i18n("账单信息不适用") # 本地运行的模型返回的账单信息
 
@@ -57,12 +69,13 @@ CHUANHU_DESCRIPTION = i18n("")
 ONLINE_MODELS = [
     "问答模型4o-online",
     "问答模型4o",
-    "deepseekv3",
-    "deepseek-reasoner",
-    "问答模型4o-mini",
-    "问答模型o1-pre",
-    "问答模型o1-mini",
     "生图模型de3",#DALL-E 3",
+    "deepseek-reasoner",
+    "问答模型o3-mini",
+    "问答模型o1-pre",
+    "问答模型4o-mini",
+    "问答模型o1-mini",
+    "deepseekv3",
     "问答模型o1",
     # "问答模型o1",
     # "问答模型o1",
@@ -148,6 +161,18 @@ DEFAULT_METADATA = {
 MODEL_METADATA = {
     # "问答模型o1-pre",
     # "问答模型o1-mini",
+    "问答模型o3-mini": {
+        "model_name": "o3-mini-all",
+        "description": "地球可用最强模型 可联网 可生图",
+        "token_limit": 128000,
+        "multimodal": True,
+        # "model_type": "OpenAIVision",
+        "stream": True,
+        "placeholder": {
+            "logo": "file=web_assets/model_logos/openai-black.webp",
+            "slogan": i18n("地球可用最强模型 可联网 可生图"),
+        }
+    },
     "问答模型o1": {
         "model_name": "o1",
         "description": "o1 正式版",
@@ -157,19 +182,19 @@ MODEL_METADATA = {
         "stream": True,
         "placeholder": {
             "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("gpt_default_slogan"),
+            "slogan": i18n("o1模型标准版 最贵模型 在所有模型解决不了的问题可以给我"),
         }
     },
     "问答模型o1-pre": {
         "model_name": "o1-preview",
         "description": "o1-preview_description",
         "token_limit": 128000,
-        "multimodal": False,
+        "multimodal": True,
         # "model_type": "OpenAIVision",
         "stream": False,
         "placeholder": {
             "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("gpt_default_slogan"),
+            "slogan": i18n("重要的事情交给我 困难的事情交给我"),
         }
     },
     "问答模型o1-mini": {
@@ -181,7 +206,7 @@ MODEL_METADATA = {
         "stream": False,
         "placeholder": {
             "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("gpt_default_slogan"),
+            "slogan": i18n("我略强于4o模型 但是价格实惠"),
         }
     },
     "唱歌模型_v3":{
@@ -195,6 +220,10 @@ MODEL_METADATA = {
     },
     "生图模型de3": {
         "model_name": "dall-e-3",
+        "placeholder": {
+            "logo": "file=web_assets/model_logos/openai-green.webp",
+            "slogan": i18n("使用我画图吧!"),
+        }
         },
     "问答模型3.5": {
         "model_name": "gpt-3.5-turbo-16k",
@@ -213,7 +242,7 @@ MODEL_METADATA = {
         "multimodal": True,
         "placeholder": {
             "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("gpt_default_slogan"),
+            "slogan": i18n("可以使用我检索互联网最新的消息"),
         }
     },
 
@@ -225,7 +254,7 @@ MODEL_METADATA = {
         "multimodal": True,
         "placeholder": {
             "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("gpt_default_slogan"),
+            "slogan": i18n("全能模型 支持图片提问"),
         }
     },
 
@@ -237,7 +266,7 @@ MODEL_METADATA = {
         "multimodal": True,
         "placeholder": {
             "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("gpt_default_slogan"),
+            "slogan": i18n("我是国产模型能力稍差"),
         }
     },
     "deepseek-reasoner":{
@@ -248,7 +277,7 @@ MODEL_METADATA = {
         "multimodal": True,
         "placeholder": {
             "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("gpt_default_slogan"),
+            "slogan": i18n("服务器间歇性繁忙"),
         }
     },
     "问答模型4o-mini":{
@@ -258,7 +287,7 @@ MODEL_METADATA = {
         "multimodal": True,
         "placeholder": {
             "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("gpt_default_slogan"),
+            "slogan": i18n("我是最便宜的模型"),
         }
     },
     "问答模型4.0 Turbo": {
@@ -402,30 +431,30 @@ MODEL_METADATA = {
             "slogan": i18n("gpt_default_slogan"),
         }
     },
-    "o1-preview": {
-        "model_name": "o1-preview",
-        "description": "o1_description",
-        "token_limit": 128000,
-        "multimodal": False,
-        "model_type": "OpenAIVision",
-        "stream": False,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
-    "o1-mini": {
-        "model_name": "o1-mini",
-        "description": "o1_description",
-        "token_limit": 128000,
-        "multimodal": False,
-        "model_type": "OpenAIVision",
-        "stream": False,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
+    # "o1-preview": {
+    #     "model_name": "o1-preview",
+    #     "description": "o1_description",
+    #     "token_limit": 128000,
+    #     "multimodal": False,
+    #     "model_type": "OpenAIVision",
+    #     "stream": False,
+    #     "placeholder": {
+    #         "logo": "file=web_assets/model_logos/openai-black.webp",
+    #         "slogan": i18n("重要的事情交给我 困难的事情交给我"),
+    #     }
+    # },
+    # "o1-mini": {
+    #     "model_name": "o1-mini",
+    #     "description": "o1_description",
+    #     "token_limit": 128000,
+    #     "multimodal": False,
+    #     "model_type": "OpenAIVision",
+    #     "stream": False,
+    #     "placeholder": {
+    #         "logo": "file=web_assets/model_logos/openai-black.webp",
+    #         "slogan": i18n("我略强于4o模型 但是价格实惠"),
+    #     }
+    # },
     "Claude 3 Haiku": {
         "model_name": "claude-3-haiku-20240307",
         "description": "claude3_haiku_description",
@@ -652,6 +681,8 @@ else:
     MODELS = ONLINE_MODELS + LOCAL_MODELS
 
 DEFAULT_MODEL = 0
+
+RENAME_MODEL = 0
 
 os.makedirs("models", exist_ok=True)
 os.makedirs("lora", exist_ok=True)

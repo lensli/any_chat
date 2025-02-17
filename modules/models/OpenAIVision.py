@@ -37,25 +37,31 @@ class OpenAIVisionClient(BaseLLMModel):
                 "api_key": api_key
             }
         )
-        duoduo_api = "https://aigcbest.top/"
+        
         deepseek_api = "https://aigcbest.top/"
+        deepseek_key = "sk-S4P3HS25sTHolaI0g2eW6UCL15lCTYqvvENzNA2FyKaKJxKj"
+
+        duoduo_api = "https://aigcbest.top/"
+        duoduo_standard = "sk-S4P3HS25sTHolaI0g2eW6UCL15lCTYqvvENzNA2FyKaKJxKj"
+        duoduo_key = "sk-JZO63ifL5sbBLhsWbe1LqV6atSwWim8VDYhO533RJJyViQgP"
+        duoduo_models = "问答模型o1,问答模型4o-online,问答模型o1-pre,问答模型o3-mini"
         if self.api_host is not None:
 
-            if model_name in "问答模型o1,问答模型4o-online":
+            if model_name in duoduo_models:
                 self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(duoduo_api)
-                self.api_key = "sk-S4P3HS25sTHolaI0g2eW6UCL15lCTYqvvENzNA2FyKaKJxKj"
+                self.api_key = duoduo_standard
             elif model_name in "deepseekv3,deepseek-reasoner":
                 self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(deepseek_api)
-                self.api_key = "sk-aBzeENtwImZMqX1JwODpE04wSxObU1bj3ZNZMM28T5V6wGvd"
+                self.api_key = deepseek_key
             else:
                 self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(self.api_host)
         else:
-            if model_name in "问答模型o1,问答模型4o-online":
+            if model_name in duoduo_models:
                 self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(duoduo_api)
-                self.api_key = "sk-S4P3HS25sTHolaI0g2eW6UCL15lCTYqvvENzNA2FyKaKJxKj"
+                self.api_key = duoduo_standard
             elif model_name in "deepseekv3,deepseek-reasoner":
                 self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(deepseek_api)
-                self.api_key = "sk-aBzeENtwImZMqX1JwODpE04wSxObU1bj3ZNZMM28T5V6wGvd"
+                self.api_key = deepseek_key
                 
             else:
                 self.api_host, self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.state.api_host, shared.state.chat_completion_url, shared.state.images_completion_url, shared.state.openai_api_base, shared.state.balance_api_url, shared.state.usage_api_url
@@ -282,6 +288,9 @@ class OpenAIVisionClient(BaseLLMModel):
             )
     def _decode_chat_response(self, response):
         error_msg = ""
+        first_content = False
+        first_reasoning_content = False
+        two_n = 0
         for chunk in response.iter_lines():
             if not chunk:
                 continue  # 跳过空行
@@ -299,6 +308,7 @@ class OpenAIVisionClient(BaseLLMModel):
                     break  # 结束标志
                 try:
                     chunk_json = json.loads(data_str)
+                    {'content': '', 'reasoning_content': '嗯', 'role': 'assistant'}
                 except json.JSONDecodeError as e:
                     logging.error(f"JSON解析错误: {e}，数据: {data_str}")
                     error_msg += data_str
@@ -309,18 +319,33 @@ class OpenAIVisionClient(BaseLLMModel):
                     if model == "gpt-4o-all":
                         # 专门处理 gpt-4o-all 模型的响应
                         content = chunk_json["choices"][0]["delta"].get("content", "")
+                        reasoning_content = chunk_json["choices"][0]["delta"].get("reasoning_content", "")
                         if content:
                             yield content
+                        if reasoning_content:
+                            yield reasoning_content
                     else:
                         # 处理其他模型的响应
                         try:
                             delta = chunk_json["choices"][0]["delta"]
                             content = delta.get("content", "")
+                            reasoning_content = chunk_json["choices"][0]["delta"].get("reasoning_content", "")
                         except Exception as e:
                             content = ""
-
                         if content:
+                            if first_content is False:
+                                first_content = True
+                                # yield f"最终输出\n================================\n"
+                                yield f"\n"
                             yield content
+                        if reasoning_content:
+                            if first_reasoning_content is False:
+                                first_reasoning_content = True
+                                yield f"思考中\n================================\n> "
+                            if "\n\n" in reasoning_content:
+                                yield reasoning_content.replace("\n\n","\n> \n") + "> "
+                            else:
+                                yield reasoning_content
                 except KeyError as e:
                     logging.error(f"解析 JSON 时缺少键: {e}，完整数据: {chunk_json}")
                     continue
@@ -387,7 +412,7 @@ class OpenAIVisionClient(BaseLLMModel):
             "temperature": f"{temperature}",
         }
         payload = {
-            "model": self.model_name,
+            "model": RENAME_MODEL if RENAME_MODEL is not None else self.model_name,
             "messages": history,
         }
 

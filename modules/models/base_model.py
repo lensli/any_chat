@@ -193,7 +193,7 @@ class ModelType(Enum):
         if "跳舞模型" in model_name_lower:
             model_type = ModelType.Dance
             return model_type
-        if model_name_lower  in "问答模型3.5,问答模型4.0 turbo,问答模型4.0,问答模型4o,问答模型4o-mini,问答模型o1-pre,问答模型o1-mini,问答模型o1,问答模型4o-online,deepseekv3,deepseek-reasoner":
+        if model_name_lower  in "问答模型3.5,问答模型4.0 turbo,问答模型4.0,问答模型4o,问答模型4o-mini,问答模型o1-pre,问答模型o1-mini,问答模型o1,问答模型4o-online,deepseekv3,deepseek-reasoner,问答模型o3-mini":
             model_type = ModelType.OpenAI
             return model_type
         if model_name_lower in "图像对话模型4v(不能生图)":
