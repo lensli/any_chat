@@ -34,7 +34,8 @@ from .. import shared
 
 from ..config import retrieve_proxy,auth_list
 
-from ..user_db.database import User_Db,get_deduction_amount
+from ..user_db.database import User_Db
+from .extensions_model_nodes import get_deduction_amount
 from ..customer.config import any,coin_name
 import tiktoken
 
@@ -174,6 +175,7 @@ class ModelType(Enum):
 
     @classmethod
     def get_type(cls, model_name: str):
+        return MODEL_METADATA[model_name]["model_type"]
         # 1. get model type from model metadata (if exists)
         model_type = MODEL_METADATA[model_name]["model_type"]
         if model_type is not None:
@@ -184,6 +186,7 @@ class ModelType(Enum):
         # 2. infer model type from model name
         model_type = None
         model_name_lower = model_name.lower()
+
         if "唱歌模型" in model_name_lower:
             model_type = ModelType.Suno
             return model_type
@@ -193,7 +196,10 @@ class ModelType(Enum):
         if "跳舞模型" in model_name_lower:
             model_type = ModelType.Dance
             return model_type
-        if model_name_lower  in "问答模型3.5,问答模型4.0 turbo,问答模型4.0,问答模型4o,问答模型4o-mini,问答模型o1-pre,问答模型o1-mini,问答模型o1,问答模型4o-online,deepseekv3,deepseek-reasoner,问答模型o3-mini":
+        if model_name_lower  in "问答模型3.5,问答模型4.0 turbo,问答模型4.0,问答模型4o,问答模型4o-mini,问答模型o1-pre,问答模型o1-mini,问答模型o1,问答模型4o-online,deepseekv3,deepseek-reasoner,问答模型o3-mini,问答模型4.5,gpt-4o-image":
+            model_type = ModelType.OpenAI
+            return model_type
+        if model_name_lower  in "问答模型o4-mini":
             model_type = ModelType.OpenAI
             return model_type
         if model_name_lower in "图像对话模型4v(不能生图)":

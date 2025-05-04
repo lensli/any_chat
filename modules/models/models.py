@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
+import random
 
 import colorama
 import commentjson as cjson
@@ -12,6 +13,7 @@ from ..index_func import *
 from ..presets import *
 from ..utils import *
 from .base_model import BaseLLMModel, ModelType
+from .extensions_model_nodes import MODEL_METADATA
 
 
 def get_model(
@@ -33,13 +35,27 @@ def get_model(
         config.local_embedding = True
     # del current_model.model
     model = original_model
+    print("::::::::::::::::::::::::")
+    print(model_type)
+    print(ModelType.OpenAIVision)
+    print(MODEL_METADATA.get(model_name))
+    print("::::::::::::::::::::::::")
+
     try:
-        if model_type == ModelType.OpenAIVision or model_type == ModelType.OpenAI:
+        if model_type.value in [ModelType.OpenAIVision.value, ModelType.OpenAI.value]:
+
             logging.info(f"正在加载 OpenAI 模型: {model_name}")
             from .OpenAIVision import OpenAIVisionClient
             access_key = os.environ.get("OPENAI_API_KEY", access_key)
+            model_param = MODEL_METADATA.get(model_name)
+
+            # model_name = model_param["model_name"]
+            select_url = model_param["urls"][0]
+            base_url =  select_url["url"]
+            access_key =  select_url["key"]
+
             model = OpenAIVisionClient(
-                model_name, api_key=access_key, user_name=user_name)
+                model_name,urls = model_param["urls"],api_host = base_url ,api_key=access_key, user_name=user_name)
         elif model_type == ModelType.Suno:
             logging.info(f"正在加载 OpenAI 模型: {model_name}")
             from .DALLE3 import OpenAI_DALLE3_Client

@@ -4,6 +4,7 @@ from pathlib import Path
 import gradio as gr
 from .customer.config import logo_name
 from .webui_locale import I18nAuto
+from .models.extensions_model_nodes import MODEL_METADATA,LOCAL_MODELS,ONLINE_MODELS
 
 i18n = I18nAuto()  # internationalization
 
@@ -66,69 +67,74 @@ CHUANHU_TITLE = i18n(logo_name)
 CHUANHU_DESCRIPTION = i18n("")
 
 
-ONLINE_MODELS = [
-    "问答模型4o-online",
-    "问答模型4o",
-    "生图模型de3",#DALL-E 3",
-    "deepseek-reasoner",
-    "问答模型o3-mini",
-    "问答模型o1-pre",
-    "问答模型4o-mini",
-    "问答模型o1-mini",
-    "deepseekv3",
-    "问答模型o1",
-    # "问答模型o1",
-    # "问答模型o1",
-    # "唱歌模型_v3",
-    # "视频模型",
-    # "跳舞模型",
+# ONLINE_MODELS = [
+#     # "问答模型4o-image",
+#     # "问答模型4o-online",
+#     "问答模型o4-mini",
+#     # "claude-3-7-sonnet-20250219-thinking",
+#     # "deepseek-reasoner",
+#     # "问答模型o3-mini",
+#     # "问答模型4.5",
+#     # "问答模型o1-pre",
 
-    # "问答模型3.5",#"GPT3.5 Turbo 16K",
-    # "问答模型4.0 Turbo",#"GPT4 Turbo",
-    # "GPT3.5 Turbo",
-    # "GPT3.5 Turbo Instruct",
+#     # "生图模型de3",#DALL-E 3",
     
-    # "GPT3.5 Turbo 0301",
-    # "GPT3.5 Turbo 0613",
-    # "GPT3.5 Turbo 1106",
-    # "GPT4",
-    # "问答模型4.0",# "GPT4 32K",
-    # "图像对话模型4v(不能生图)",#"GPT4 Vision",
-    # "川虎助理",
-    # "川虎助理 Pro",
+#     # "问答模型4o-mini",
+#     # "问答模型o1-mini",
+#     # "deepseekv3",
+#     # "问答模型o1",
+#     # "问答模型o1",
+#     # "问答模型o1",
+#     # "唱歌模型_v3",
+#     # "视频模型",
+#     # "跳舞模型",
 
-    # "GooglePaLM",
-    # "xmchat",
-    # "Azure OpenAI",
-    # "yuanai-1.0-base_10B",
-    # "yuanai-1.0-translate",
-    # "yuanai-1.0-dialog",
-    # "yuanai-1.0-rhythm_poems",
-    # "minimax-abab5-chat",
-    # "midjourney",
-    "讯飞星火大模型V3.0",
-    # "讯飞星火大模型V2.0",
-    # "讯飞星火大模型V1.5",
-    # "Claude",
-    # "ERNIE-Bot-turbo",
-    # "ERNIE-Bot",
-    # "ERNIE-Bot-4",
-]
+#     # "问答模型3.5",#"GPT3.5 Turbo 16K",
+#     # "问答模型4.0 Turbo",#"GPT4 Turbo",
+#     # "GPT3.5 Turbo",
+#     # "GPT3.5 Turbo Instruct",
+    
+#     # "GPT3.5 Turbo 0301",
+#     # "GPT3.5 Turbo 0613",
+#     # "GPT3.5 Turbo 1106",
+#     # "GPT4",
+#     # "问答模型4.0",# "GPT4 32K",
+#     # "图像对话模型4v(不能生图)",#"GPT4 Vision",
+#     # "川虎助理",
+#     # "川虎助理 Pro",
 
-LOCAL_MODELS = [
-    # "chatglm-6b",
-    # "chatglm-6b-int4",
-    # "chatglm-6b-int4-ge",
-    # "chatglm2-6b",
-    # "chatglm2-6b-int4",
-    # "chatglm3-6b",
-    # "chatglm3-6b-32k",
-    # "StableLM",
-    # "MOSS",
-    # "Llama-2-7B-Chat",
-    # "Qwen 7B",
-    # "Qwen 14B"
-]
+#     # "GooglePaLM",
+#     # "xmchat",
+#     # "Azure OpenAI",
+#     # "yuanai-1.0-base_10B",
+#     # "yuanai-1.0-translate",
+#     # "yuanai-1.0-dialog",
+#     # "yuanai-1.0-rhythm_poems",
+#     # "minimax-abab5-chat",
+#     # "midjourney",
+#     # "讯飞星火大模型V3.0",
+#     # "讯飞星火大模型V2.0",
+#     # "讯飞星火大模型V1.5",
+#     # "Claude",
+#     # "ERNIE-Bot-turbo",
+#     # "ERNIE-Bot",
+#     # "ERNIE-Bot-4",
+# ]
+
+# LOCAL_MODELS = [
+#     # "chatglm-6b",
+#     # "chatglm-6b-int4",
+#     # "chatglm-6b-int4-ge",
+#     # "chatglm2-6b",
+#     # "chatglm2-6b-int4",
+#     # "chatglm3-6b",
+#     # "chatglm3-6b-32k",
+#     # "StableLM",
+#     # "MOSS",
+#     # "Llama-2-7B-Chat",
+#     # "Qwen 7B",
+#     # "Qwen 14B"
+# ]
 
 DEFAULT_METADATA = {
     "repo_id": None, # HuggingFace repo id, used if this model is meant to be downloaded from HuggingFace then run locally
@@ -158,522 +164,569 @@ DEFAULT_METADATA = {
 }
 
 # Additional metadata for online and local models
-MODEL_METADATA = {
-    # "问答模型o1-pre",
-    # "问答模型o1-mini",
-    "问答模型o3-mini": {
-        "model_name": "o3-mini-all",
-        "description": "地球可用最强模型 可联网 可生图",
-        "token_limit": 128000,
-        "multimodal": True,
-        # "model_type": "OpenAIVision",
-        "stream": True,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("地球可用最强模型 可联网 可生图"),
-        }
-    },
-    "问答模型o1": {
-        "model_name": "o1",
-        "description": "o1 正式版",
-        "token_limit": 128000,
-        "multimodal": True,
-        # "model_type": "OpenAIVision",
-        "stream": True,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("o1模型标准版 最贵模型 在所有模型解决不了的问题可以给我"),
-        }
-    },
-    "问答模型o1-pre": {
-        "model_name": "o1-preview",
-        "description": "o1-preview_description",
-        "token_limit": 128000,
-        "multimodal": True,
-        # "model_type": "OpenAIVision",
-        "stream": False,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("重要的事情交给我 困难的事情交给我"),
-        }
-    },
-    "问答模型o1-mini": {
-        "model_name": "o1-mini",
-        "description": "o1-mini_description",
-        "token_limit": 128000,
-        "multimodal": False,
-        # "model_type": "OpenAIVision",
-        "stream": False,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("我略强于4o模型 但是价格实惠"),
-        }
-    },
-    "唱歌模型_v3":{
-        "model_name": "suno_v3",
-    },
-    "视频模型":{
-        "model_name": "vedio",
-    },
-    "跳舞模型":{
-        "model_name": "dance",
-    },
-    "生图模型de3": {
-        "model_name": "dall-e-3",
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("使用我画图吧!"),
-        }
-        },
-    "问答模型3.5": {
-        "model_name": "gpt-3.5-turbo-16k",
-        "description": "gpt3.5turbo_16k_description",
-        "token_limit": 16384,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
-    "问答模型4o-online":{
-        "model_name": "gpt-4o-all",
-        "description": "gpt4o-all 网络版",
+# MODEL_METADATA = {
+#     # "问答模型o1-pre",
+#     # "问答模型o1-mini",
+#     # "claude-3-7-sonnet-20250219-thinking":{
+#     #     "model_name": "claude-3-7-sonnet-20250219-thinking",
+#     #     "description": "写代码性能最好",
+#     #     "token_limit": 128000,
+#     #     "multimodal": True,
+#     #     # "model_type": "OpenAIVision",
+#     #     "stream": True,
+#     #     "placeholder": {
+#     #         "logo": "file=web_assets/model_logos/openai-black.webp",
+#     #         "slogan": i18n("地球可用最强非思维链模型"),
+#     #     }
 
-        "token_limit": 128000,
-        "multimodal": True,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("可以使用我检索互联网最新的消息"),
-        }
-    },
+#     # },
+#     "问答模型4.5":{
+#         "model_name": "gpt-4.5-preview",
+#         "description": "地球可用最强非思维链模型",
+#         "token_limit": 128000,
+#         "multimodal": True,
+#         # "model_type": "OpenAIVision",
+#         "stream": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-black.webp",
+#             "slogan": i18n("地球可用最强非思维链模型"),
+#         }
+#     },
+#     "问答模型o3-mini": {
+#         "model_name": "o3-mini",#-all",
+#         "description": "地球可用最强模型",# 可联网 可生图",
+#         "token_limit": 128000,
+#         "multimodal": True,
+#         # "model_type": "OpenAIVision",
+#         "stream": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-black.webp",
+#             "slogan": i18n("地球可用最强模型 可联网 可生图"),
+#         }
+#     },
+#     "问答模型o1": {
+#         "model_name": "o1",
+#         "description": "o1 正式版",
+#         "token_limit": 128000,
+#         "multimodal": True,
+#         # "model_type": "OpenAIVision",
+#         "stream": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-black.webp",
+#             "slogan": i18n("o1模型标准版 最贵模型 在所有模型解决不了的问题可以给我"),
+#         }
+#     },
+#     "问答模型o1-pre": {
+#         "model_name": "o1-preview",
+#         "description": "o1-preview_description",
+#         "token_limit": 128000,
+#         "multimodal": True,
+#         # "model_type": "OpenAIVision",
+#         "stream": False,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-black.webp",
+#             "slogan": i18n("重要的事情交给我 困难的事情交给我"),
+#         }
+#     },
+#     "问答模型o1-mini": {
+#         "model_name": "o1-mini",
+#         "description": "o1-mini_description",
+#         "token_limit": 128000,
+#         "multimodal": False,
+#         # "model_type": "OpenAIVision",
+#         "stream": False,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-black.webp",
+#             "slogan": i18n("我略强于4o模型 但是价格实惠"),
+#         }
+#     },
+#     "唱歌模型_v3":{
+#         "model_name": "suno_v3",
+#     },
+#     "视频模型":{
+#         "model_name": "vedio",
+#     },
+#     "跳舞模型":{
+#         "model_name": "dance",
+#     },
+#     "生图模型de3": {
+#         "model_name": "dall-e-3",
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-green.webp",
+#             "slogan": i18n("使用我画图吧!"),
+#         }
+#         },
+#     "问答模型3.5": {
+#         "model_name": "gpt-3.5-turbo-16k",
+#         "description": "gpt3.5turbo_16k_description",
+#         "token_limit": 16384,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-green.webp",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
+#     "问答模型4o-image":{
+#         "model_name": "gpt-4o-image",
+#         "description": "gpt-4o-image",
 
-    "问答模型4o":{
-        "model_name": "gpt-4o",
-        "description": "gpt4o_description",
+#         "token_limit": 128000,
+#         "multimodal": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-green.webp",
+#             "slogan": i18n("可以使用我检索互联网最新的消息"),
+#         }
+#     },
+#     "问答模型4o-online":{
+#         "model_name": "gpt-4o-all",
+#         "description": "gpt4o-all 网络版",
 
-        "token_limit": 128000,
-        "multimodal": True,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("全能模型 支持图片提问"),
-        }
-    },
+#         "token_limit": 128000,
+#         "multimodal": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-green.webp",
+#             "slogan": i18n("可以使用我检索互联网最新的消息"),
+#         }
+#     },
 
-    "deepseekv3":{
-        "model_name": "deepseek-chat",
-        "description": "gpt4o_description",
+#     "问答模型o4-mini":{
+#         "model_name": "o4-mini",
+#         "description": "gpt4o_description",
 
-        "token_limit": 128000,
-        "multimodal": True,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("我是国产模型能力稍差"),
-        }
-    },
-    "deepseek-reasoner":{
-        "model_name": "deepseek-reasoner",
-        "description": "deepseek-reasoner",
+#         "token_limit": 128000,
+#         "multimodal": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-green.webp",
+#             "slogan": i18n("全能模型 支持图片提问"),
+#         }
+#     },
 
-        "token_limit": 128000,
-        "multimodal": True,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("服务器间歇性繁忙"),
-        }
-    },
-    "问答模型4o-mini":{
-        "model_name": "gpt-4o-mini",
-        "description": "gpt4omini_description",
-        "token_limit": 128000,
-        "multimodal": True,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("我是最便宜的模型"),
-        }
-    },
-    "问答模型4.0 Turbo": {
-        "model_name": "gpt-4-turbo",
-        "description": "gpt4turbo_description",
-        "token_limit": 128000,
-        "multimodal": True,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
-    "问答模型4.0": {
-        "model_name": "gpt-4",
-        "description": "gpt4_description",
-        "token_limit": 8192,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
+#     "deepseekv3":{
+#         "model_name": "deepseek-chat",
+#         "description": "gpt4o_description",
 
-    "图像对话模型4v(不能生图)": {
-        "model_name": "gpt-4-vision-preview",
-        "token_limit": 128000,
-    },
-    "Llama-2-7B":{
-        "repo_id": "TheBloke/Llama-2-7B-GGUF",
-        "filelist": ["llama-2-7b.Q6_K.gguf"],
-    },
-    "Llama-2-7B-Chat":{
-        "repo_id": "TheBloke/Llama-2-7b-Chat-GGUF",
-        "filelist": ["llama-2-7b-chat.Q6_K.gguf"],
-    },
-    "Qwen 7B": {
-        "repo_id": "Qwen/Qwen-7B-Chat-Int4",
-    },
-    "Qwen 14B": {
-        "repo_id": "Qwen/Qwen-14B-Chat-Int4",
-    },
-    "GPT3.5 Turbo": {
-        "model_name": "gpt-3.5-turbo",
-        "description": "gpt3.5turbo_description",
-        "token_limit": 4096,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
-    "GPT3.5 Turbo Instruct": {
-        "model_name": "gpt-3.5-turbo-instruct",
-        "description": "gpt3.5turbo_instruct_description",
-        "token_limit": 4096,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
-    "GPT3.5 Turbo 16K": {
-        "model_name": "gpt-3.5-turbo-16k",
-        "description": "gpt3.5turbo_16k_description",
-        "token_limit": 16384,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
-    "GPT3.5 Turbo 0301": {
-        "model_name": "gpt-3.5-turbo-0301",
-        "token_limit": 4096,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
-    "GPT3.5 Turbo 0613": {
-        "model_name": "gpt-3.5-turbo-0613",
-        "token_limit": 4096,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
-    "GPT3.5 Turbo 1106": {
-    "model_name": "gpt-3.5-turbo-1106",
-    "token_limit": 16384,
-    "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-green.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
-    "GPT4": {
-        "model_name": "gpt-4",
-        "description": "gpt4_description",
-        "token_limit": 8192,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
-    "GPT4 32K": {
-        "model_name": "gpt-4-32k",
-        "description": "gpt4_32k_description",
-        "token_limit": 32768,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
-    "GPT4 Turbo": {
+#         "token_limit": 128000,
+#         "multimodal": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-green.webp",
+#             "slogan": i18n("我是国产模型能力稍差"),
+#         }
+#     },
+#     "deepseek-reasoner":{
+#         "model_name": "deepseek-reasoner",
+#         "description": "deepseek-reasoner",
+
+#         "token_limit": 128000,
+#         "multimodal": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-green.webp",
+#             "slogan": i18n("服务器间歇性繁忙"),
+#         }
+#     },
+#     "问答模型4o-mini":{
+#         "model_name": "gpt-4o-mini",
+#         "description": "gpt4omini_description",
+#         "token_limit": 128000,
+#         "multimodal": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-black.webp",
+#             "slogan": i18n("我是最便宜的模型"),
+#         }
+#     },
+#     "问答模型4.0 Turbo": {
+#         "model_name": "gpt-4-turbo",
+#         "description": "gpt4turbo_description",
+#         "token_limit": 128000,
+#         "multimodal": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-black.webp",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
+#     "问答模型4.0": {
+#         "model_name": "gpt-4",
+#         "description": "gpt4_description",
+#         "token_limit": 8192,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-black.webp",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
+
+#     "图像对话模型4v(不能生图)": {
+#         "model_name": "gpt-4-vision-preview",
+#         "token_limit": 128000,
+#     },
+#     "Llama-2-7B":{
+#         "repo_id": "TheBloke/Llama-2-7B-GGUF",
+#         "filelist": ["llama-2-7b.Q6_K.gguf"],
+#     },
+#     "Llama-2-7B-Chat":{
+#         "repo_id": "TheBloke/Llama-2-7b-Chat-GGUF",
+#         "filelist": ["llama-2-7b-chat.Q6_K.gguf"],
+#     },
+#     "Qwen 7B": {
+#         "repo_id": "Qwen/Qwen-7B-Chat-Int4",
+#     },
+#     "Qwen 14B": {
+#         "repo_id": "Qwen/Qwen-14B-Chat-Int4",
+#     },
+#     "GPT3.5 Turbo": {
+#         "model_name": "gpt-3.5-turbo",
+#         "description": "gpt3.5turbo_description",
+#         "token_limit": 4096,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-green.webp",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
+#     "GPT3.5 Turbo Instruct": {
+#         "model_name": "gpt-3.5-turbo-instruct",
+#         "description": "gpt3.5turbo_instruct_description",
+#         "token_limit": 4096,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-green.webp",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
+#     "GPT3.5 Turbo 16K": {
+#         "model_name": "gpt-3.5-turbo-16k",
+#         "description": "gpt3.5turbo_16k_description",
+#         "token_limit": 16384,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-green.webp",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
+#     "GPT3.5 Turbo 0301": {
+#         "model_name": "gpt-3.5-turbo-0301",
+#         "token_limit": 4096,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-green.webp",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
+#     "GPT3.5 Turbo 0613": {
+#         "model_name": "gpt-3.5-turbo-0613",
+#         "token_limit": 4096,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-green.webp",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
+#     "GPT3.5 Turbo 1106": {
+#     "model_name": "gpt-3.5-turbo-1106",
+#     "token_limit": 16384,
+#     "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-green.webp",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
+#     "GPT4": {
+#         "model_name": "gpt-4",
+#         "description": "gpt4_description",
+#         "token_limit": 8192,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-black.webp",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
+#     "GPT4 32K": {
+#         "model_name": "gpt-4-32k",
+#         "description": "gpt4_32k_description",
+#         "token_limit": 32768,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-black.webp",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
+#     "GPT4 Turbo": {
 
 
-        "model_name": "gpt-4-turbo",
-        "description": "gpt4turbo_description",
-        "token_limit": 128000,
-        "multimodal": True,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
+#         "model_name": "gpt-4-turbo",
+#         "description": "gpt4turbo_description",
+#         "token_limit": 128000,
+#         "multimodal": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-black.webp",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
 
-    "GPT-4o": {
-        "model_name": "gpt-4o",
-        "description": "gpt4o_description",
+#     "GPT-4o": {
+#         "model_name": "gpt-4o",
+#         "description": "gpt4o_description",
 
-        "token_limit": 128000,
-        "multimodal": True,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
-    "GPT-4o-mini": {
-        "model_name": "gpt-4o-mini",
-        "description": "gpt4omini_description",
-        "token_limit": 128000,
-        "multimodal": True,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/openai-black.webp",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
-    # "o1-preview": {
-    #     "model_name": "o1-preview",
-    #     "description": "o1_description",
-    #     "token_limit": 128000,
-    #     "multimodal": False,
-    #     "model_type": "OpenAIVision",
-    #     "stream": False,
-    #     "placeholder": {
-    #         "logo": "file=web_assets/model_logos/openai-black.webp",
-    #         "slogan": i18n("重要的事情交给我 困难的事情交给我"),
-    #     }
-    # },
-    # "o1-mini": {
-    #     "model_name": "o1-mini",
-    #     "description": "o1_description",
-    #     "token_limit": 128000,
-    #     "multimodal": False,
-    #     "model_type": "OpenAIVision",
-    #     "stream": False,
-    #     "placeholder": {
-    #         "logo": "file=web_assets/model_logos/openai-black.webp",
-    #         "slogan": i18n("我略强于4o模型 但是价格实惠"),
-    #     }
-    # },
-    "Claude 3 Haiku": {
-        "model_name": "claude-3-haiku-20240307",
-        "description": "claude3_haiku_description",
-        "token_limit": 200000,
-        "max_generation": 4096,
-        "multimodal": True,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/claude-3.jpg",
-            "slogan": i18n("claude_default_slogan"),
-        }
-    },
-    "Claude 3.5 Sonnet": {
-        "model_name": "claude-3-5-sonnet-20240620",
-        "description": "claude3_sonnet_description",
-        "token_limit": 200000,
-        "max_generation": 4096,
-        "multimodal": True,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/claude-3.jpg",
-            "slogan": i18n("claude_default_slogan"),
-        }
-    },
-    "Claude 3 Opus": {
-        "model_name": "claude-3-opus-20240229",
-        "description": "claude3_opus_description",
-        "token_limit": 200000,
-        "max_generation": 4096,
-        "multimodal": True,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/claude-3.jpg",
-            "slogan": i18n("claude_default_slogan"),
-        }
-    },
-    "川虎助理": {
-        "model_name": "川虎助理",
-        "description": i18n("chuanhu_description"),
-        "placeholder": {
-            "logo": "file=web_assets/icon/any-icon-512.png",
-            "logo_rounded": "false",
-            "slogan": i18n("chuanhu_slogan"),
-            "question_1": i18n("chuanhu_question_1"),
-            "question_2": i18n("chuanhu_question_2"),
-            "question_3": i18n("chuanhu_question_3"),
-            "question_4": i18n("chuanhu_question_4"),
-        }
-    },
-    "川虎助理 Pro": {
-        "model_name": "川虎助理 Pro",
-        "description": "类似 AutoGPT，全自动解决你的问题",
-        "placeholder": {
-            "logo": "file=web_assets/icon/any-icon-512.png",
-            "logo_rounded": "false",
-            "slogan": "川虎Pro今天能帮你做些什么？",
-            "question_1": "明天杭州天气如何？",
-            "question_2": "最近 Apple 发布了什么新品？",
-            "question_3": "现在显卡的价格如何？",
-            "question_4": "TikTok 上有什么新梗？",
-        }
-    },
-    "DALL-E 3": {"model_name": "dall-e-3"},
-    "ERNIE-Bot-turbo": {
-        "model_name": "ERNIE-Bot-turbo",
-        "token_limit": 1024,
-    },
-    "ERNIE-Bot": {
-        "model_name": "ERNIE-Bot",
-        "token_limit": 1024,
-    },
-    "ERNIE-Bot-4": {
-        "model_name": "ERNIE-Bot-4",
-        "token_limit": 1024,
-    },
-    "Gemini Pro": {
-        "model_name": "gemini-pro",
-        "token_limit": 30720,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/gemini.svg",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
-    "Gemini Pro Vision": {
-        "model_name": "gemini-pro-vision",
-        "token_limit": 30720,
-        "placeholder": {
-            "logo": "file=web_assets/model_logos/gemini.svg",
-            "slogan": i18n("gpt_default_slogan"),
-        }
-    },
-    "Ollama": {
-        "model_name": "ollama",
-        "token_limit": 4096,
-    },
-    "Gemma 2B": {
-        "repo_id": "google/gemma-2b-it",
-        "model_name": "gemma-2b-it",
-        "token_limit": 8192,
-    },
-    "Gemma 7B": {
-        "repo_id": "google/gemma-7b-it",
-        "model_name": "gemma-7b-it",
-        "token_limit": 8192,
-    },
-    "Groq LLaMA3 8B": {
-        "model_name": "llama3-8b-8192",
-        "description": "groq_llama3_8b_description",
-        "token_limit": 8192,
-    },
-    "Groq LLaMA3 70B": {
-        "model_name": "llama3-70b-8192",
-        "description": "groq_llama3_70b_description",
-        "token_limit": 8192,
-    },
-    "Groq Mixtral 8x7B": {
-        "model_name": "mixtral-8x7b-32768",
-        "description": "groq_mixtral_8x7b_description",
-        "token_limit": 32768,
-    },
-    "Groq Gemma 7B": {
-        "model_name": "gemma-7b-it",
-        "description": "groq_gemma_7b_description",
-        "token_limit": 8192,
-    },
-    "GooglePaLM": {"model_name": "models/chat-bison-001"},
-    "xmchat": {"model_name": "xmchat"},
-    "Azure OpenAI": {"model_name": "azure-openai"},
-    "yuanai-1.0-base_10B": {"model_name": "yuanai-1.0-base_10B"},
-    "yuanai-1.0-translate": {"model_name": "yuanai-1.0-translate"},
-    "yuanai-1.0-dialog": {"model_name": "yuanai-1.0-dialog"},
-    "yuanai-1.0-rhythm_poems": {"model_name": "yuanai-1.0-rhythm_poems"},
-    "minimax-abab5-chat": {"model_name": "minimax-abab5-chat"},
-    "midjourney": {"model_name": "midjourney"},
-    # 兼容旧配置文件，待删除
-    "讯飞星火大模型V4.0": {
-        "model_name": "讯飞星火大模型V4.0",
-        "token_limit": 8192,
-        "metadata": {
-            "path": "/v4.0/chat",
-            "domain": "4.0Ultra"
-        }
-    },
-    "讯飞星火大模型V3.5": {
-        "model_name": "讯飞星火大模型V3.5",
-        "token_limit": 8192,
-        "metadata": {
-            "path": "/v3.5/chat",
-            "domain": "generalv3.5"
-        }
-    },
-    "讯飞星火大模型V3.0": {
-        "model_name": "讯飞星火大模型V3.0",
-        "token_limit": 8192,
-        "metadata": {
-            "path": "/v3.1/chat",
-            "domain": "generalv3"
-        }
-    },
-    "讯飞星火大模型V2.0": {
-        "model_name": "讯飞星火大模型V2.0",
-        "metadata": {
-            "path": "/v2.1/chat",
-            "domain": "generalv2"
-        }
-    },
-    "讯飞星火大模型V1.5": {
-        "model_name": "讯飞星火大模型V1.5",
-        "metadata": {
-            "path": "/v1.1/chat",
-            "domain": "general"
-        }
-    },
-    # 新的名称
-    "讯飞星火4.0 Ultra": {
-        "model_name": "讯飞星火4.0 Ultra",
-        "token_limit": 8192,
-        "metadata": {
-            "path": "/v4.0/chat",
-            "domain": "4.0Ultra"
-        }
-    },
-    "讯飞星火Max": {
-        "model_name": "讯飞星火Max",
-        "token_limit": 8192,
-        "metadata": {
-            "path": "/v3.5/chat",
-            "domain": "generalv3.5"
-        }
-    },
+#         "token_limit": 128000,
+#         "multimodal": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-black.webp",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
+#     "GPT-4o-mini": {
+#         "model_name": "gpt-4o-mini",
+#         "description": "gpt4omini_description",
+#         "token_limit": 128000,
+#         "multimodal": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/openai-black.webp",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
+#     # "o1-preview": {
+#     #     "model_name": "o1-preview",
+#     #     "description": "o1_description",
+#     #     "token_limit": 128000,
+#     #     "multimodal": False,
+#     #     "model_type": "OpenAIVision",
+#     #     "stream": False,
+#     #     "placeholder": {
+#     #         "logo": "file=web_assets/model_logos/openai-black.webp",
+#     #         "slogan": i18n("重要的事情交给我 困难的事情交给我"),
+#     #     }
+#     # },
+#     # "o1-mini": {
+#     #     "model_name": "o1-mini",
+#     #     "description": "o1_description",
+#     #     "token_limit": 128000,
+#     #     "multimodal": False,
+#     #     "model_type": "OpenAIVision",
+#     #     "stream": False,
+#     #     "placeholder": {
+#     #         "logo": "file=web_assets/model_logos/openai-black.webp",
+#     #         "slogan": i18n("我略强于4o模型 但是价格实惠"),
+#     #     }
+#     # },
+#     "Claude 3 Haiku": {
+#         "model_name": "claude-3-haiku-20240307",
+#         "description": "claude3_haiku_description",
+#         "token_limit": 200000,
+#         "max_generation": 4096,
+#         "multimodal": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/claude-3.jpg",
+#             "slogan": i18n("claude_default_slogan"),
+#         }
+#     },
+#     "claude-3-7-sonnet-20250219-thinking": {
+#         "model_name": "claude-3-5-sonnet-latest",
+#         "description": "写代码最强",
+#         "token_limit": 200000000,
+#         "max_generation": 4096,
+#         "multimodal": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/claude-3.jpg",
+#             "slogan": i18n("写代码最强"),
+#         }
+#     },
+#     "Claude 3.5 Sonnet": {
+#         "model_name": "claude-3-5-sonnet-20240620",
+#         "description": "claude3_sonnet_description",
+#         "token_limit": 200000,
+#         "max_generation": 4096,
+#         "multimodal": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/claude-3.jpg",
+#             "slogan": i18n("claude_default_slogan"),
+#         }
+#     },
+#     "Claude 3 Opus": {
+#         "model_name": "claude-3-opus-20240229",
+#         "description": "claude3_opus_description",
+#         "token_limit": 200000,
+#         "max_generation": 4096,
+#         "multimodal": True,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/claude-3.jpg",
+#             "slogan": i18n("claude_default_slogan"),
+#         }
+#     },
+#     "川虎助理": {
+#         "model_name": "川虎助理",
+#         "description": i18n("chuanhu_description"),
+#         "placeholder": {
+#             "logo": "file=web_assets/icon/any-icon-512.png",
+#             "logo_rounded": "false",
+#             "slogan": i18n("chuanhu_slogan"),
+#             "question_1": i18n("chuanhu_question_1"),
+#             "question_2": i18n("chuanhu_question_2"),
+#             "question_3": i18n("chuanhu_question_3"),
+#             "question_4": i18n("chuanhu_question_4"),
+#         }
+#     },
+#     "川虎助理 Pro": {
+#         "model_name": "川虎助理 Pro",
+#         "description": "类似 AutoGPT，全自动解决你的问题",
+#         "placeholder": {
+#             "logo": "file=web_assets/icon/any-icon-512.png",
+#             "logo_rounded": "false",
+#             "slogan": "川虎Pro今天能帮你做些什么？",
+#             "question_1": "明天杭州天气如何？",
+#             "question_2": "最近 Apple 发布了什么新品？",
+#             "question_3": "现在显卡的价格如何？",
+#             "question_4": "TikTok 上有什么新梗？",
+#         }
+#     },
+#     "DALL-E 3": {"model_name": "dall-e-3"},
+#     "ERNIE-Bot-turbo": {
+#         "model_name": "ERNIE-Bot-turbo",
+#         "token_limit": 1024,
+#     },
+#     "ERNIE-Bot": {
+#         "model_name": "ERNIE-Bot",
+#         "token_limit": 1024,
+#     },
+#     "ERNIE-Bot-4": {
+#         "model_name": "ERNIE-Bot-4",
+#         "token_limit": 1024,
+#     },
+#     "Gemini Pro": {
+#         "model_name": "gemini-pro",
+#         "token_limit": 30720,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/gemini.svg",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
+#     "Gemini Pro Vision": {
+#         "model_name": "gemini-pro-vision",
+#         "token_limit": 30720,
+#         "placeholder": {
+#             "logo": "file=web_assets/model_logos/gemini.svg",
+#             "slogan": i18n("gpt_default_slogan"),
+#         }
+#     },
+#     "Ollama": {
+#         "model_name": "ollama",
+#         "token_limit": 4096,
+#     },
+#     "Gemma 2B": {
+#         "repo_id": "google/gemma-2b-it",
+#         "model_name": "gemma-2b-it",
+#         "token_limit": 8192,
+#     },
+#     "Gemma 7B": {
+#         "repo_id": "google/gemma-7b-it",
+#         "model_name": "gemma-7b-it",
+#         "token_limit": 8192,
+#     },
+#     "Groq LLaMA3 8B": {
+#         "model_name": "llama3-8b-8192",
+#         "description": "groq_llama3_8b_description",
+#         "token_limit": 8192,
+#     },
+#     "Groq LLaMA3 70B": {
+#         "model_name": "llama3-70b-8192",
+#         "description": "groq_llama3_70b_description",
+#         "token_limit": 8192,
+#     },
+#     "Groq Mixtral 8x7B": {
+#         "model_name": "mixtral-8x7b-32768",
+#         "description": "groq_mixtral_8x7b_description",
+#         "token_limit": 32768,
+#     },
+#     "Groq Gemma 7B": {
+#         "model_name": "gemma-7b-it",
+#         "description": "groq_gemma_7b_description",
+#         "token_limit": 8192,
+#     },
+#     "GooglePaLM": {"model_name": "models/chat-bison-001"},
+#     "xmchat": {"model_name": "xmchat"},
+#     "Azure OpenAI": {"model_name": "azure-openai"},
+#     "yuanai-1.0-base_10B": {"model_name": "yuanai-1.0-base_10B"},
+#     "yuanai-1.0-translate": {"model_name": "yuanai-1.0-translate"},
+#     "yuanai-1.0-dialog": {"model_name": "yuanai-1.0-dialog"},
+#     "yuanai-1.0-rhythm_poems": {"model_name": "yuanai-1.0-rhythm_poems"},
+#     "minimax-abab5-chat": {"model_name": "minimax-abab5-chat"},
+#     "midjourney": {"model_name": "midjourney"},
+#     # 兼容旧配置文件，待删除
+#     "讯飞星火大模型V4.0": {
+#         "model_name": "讯飞星火大模型V4.0",
+#         "token_limit": 8192,
+#         "metadata": {
+#             "path": "/v4.0/chat",
+#             "domain": "4.0Ultra"
+#         }
+#     },
+#     "讯飞星火大模型V3.5": {
+#         "model_name": "讯飞星火大模型V3.5",
+#         "token_limit": 8192,
+#         "metadata": {
+#             "path": "/v3.5/chat",
+#             "domain": "generalv3.5"
+#         }
+#     },
+#     "讯飞星火大模型V3.0": {
+#         "model_name": "讯飞星火大模型V3.0",
+#         "token_limit": 8192,
+#         "metadata": {
+#             "path": "/v3.1/chat",
+#             "domain": "generalv3"
+#         }
+#     },
+#     "讯飞星火大模型V2.0": {
+#         "model_name": "讯飞星火大模型V2.0",
+#         "metadata": {
+#             "path": "/v2.1/chat",
+#             "domain": "generalv2"
+#         }
+#     },
+#     "讯飞星火大模型V1.5": {
+#         "model_name": "讯飞星火大模型V1.5",
+#         "metadata": {
+#             "path": "/v1.1/chat",
+#             "domain": "general"
+#         }
+#     },
+#     # 新的名称
+#     "讯飞星火4.0 Ultra": {
+#         "model_name": "讯飞星火4.0 Ultra",
+#         "token_limit": 8192,
+#         "metadata": {
+#             "path": "/v4.0/chat",
+#             "domain": "4.0Ultra"
+#         }
+#     },
+#     "讯飞星火Max": {
+#         "model_name": "讯飞星火Max",
+#         "token_limit": 8192,
+#         "metadata": {
+#             "path": "/v3.5/chat",
+#             "domain": "generalv3.5"
+#         }
+#     },
 
-    "讯飞星火Pro 128K": {
-        "model_name": "讯飞星火Pro 128K",
-        "token_limit": 131072, # 128 * 1024
-        "metadata": {
-            "path": "/chat/pro-128k",
-            "domain": "pro-128k"
-        }
-    },
-    "讯飞星火Pro": {
-        "model_name": "讯飞星火Pro",
-        "token_limit": 8192,
-        "metadata": {
-            "path": "/v3.1/chat",
-            "domain": "generalv3"
-        }
-    },
-    "讯飞星火V2.0": {
-        "model_name": "讯飞星火V2.0",
-        "metadata": {
-            "path": "/v2.1/chat",
-            "domain": "generalv2"
-        }
-    },
-    "讯飞星火Lite": {
-        "model_name": "讯飞星火Lite",
-        "metadata": {
-            "path": "/v1.1/chat",
-            "domain": "general"
-        }
-    }
-}
+#     "讯飞星火Pro 128K": {
+#         "model_name": "讯飞星火Pro 128K",
+#         "token_limit": 131072, # 128 * 1024
+#         "metadata": {
+#             "path": "/chat/pro-128k",
+#             "domain": "pro-128k"
+#         }
+#     },
+#     "讯飞星火Pro": {
+#         "model_name": "讯飞星火Pro",
+#         "token_limit": 8192,
+#         "metadata": {
+#             "path": "/v3.1/chat",
+#             "domain": "generalv3"
+#         }
+#     },
+#     "讯飞星火V2.0": {
+#         "model_name": "讯飞星火V2.0",
+#         "metadata": {
+#             "path": "/v2.1/chat",
+#             "domain": "generalv2"
+#         }
+#     },
+#     "讯飞星火Lite": {
+#         "model_name": "讯飞星火Lite",
+#         "metadata": {
+#             "path": "/v1.1/chat",
+#             "domain": "general"
+#         }
+#     }
+# }
 
 if os.environ.get('HIDE_LOCAL_MODELS', 'false') == 'true':
     MODELS = ONLINE_MODELS

@@ -20,6 +20,7 @@ from ..index_func import *
 from ..presets import *
 from ..utils import *
 from .base_model import BaseLLMModel
+import textwrap
 
 
 
@@ -27,44 +28,32 @@ class OpenAIVisionClient(BaseLLMModel):
     def __init__(
         self,
         model_name,
+        urls,
+        api_host,
         api_key,
+        
         user_name=""
     ) -> None:
         super().__init__(
+
             model_name=model_name,
             user=user_name,
             config={
                 "api_key": api_key
             }
         )
-        
-        deepseek_api = "https://aigcbest.top/"
-        deepseek_key = "sk-S4P3HS25sTHolaI0g2eW6UCL15lCTYqvvENzNA2FyKaKJxKj"
 
-        duoduo_api = "https://aigcbest.top/"
-        duoduo_standard = "sk-S4P3HS25sTHolaI0g2eW6UCL15lCTYqvvENzNA2FyKaKJxKj"
-        duoduo_key = "sk-JZO63ifL5sbBLhsWbe1LqV6atSwWim8VDYhO533RJJyViQgP"
-        duoduo_models = "问答模型o1,问答模型4o-online,问答模型o1-pre,问答模型o3-mini"
+
+        self.api_host = api_host
+        self.urls = urls
+
+
+
+
         if self.api_host is not None:
-
-            if model_name in duoduo_models:
-                self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(duoduo_api)
-                self.api_key = duoduo_standard
-            elif model_name in "deepseekv3,deepseek-reasoner":
-                self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(deepseek_api)
-                self.api_key = deepseek_key
-            else:
-                self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(self.api_host)
+            self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(self.api_host)
         else:
-            if model_name in duoduo_models:
-                self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(duoduo_api)
-                self.api_key = duoduo_standard
-            elif model_name in "deepseekv3,deepseek-reasoner":
-                self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.format_openai_host(deepseek_api)
-                self.api_key = deepseek_key
-                
-            else:
-                self.api_host, self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.state.api_host, shared.state.chat_completion_url, shared.state.images_completion_url, shared.state.openai_api_base, shared.state.balance_api_url, shared.state.usage_api_url
+            self.api_host, self.chat_completion_url, self.images_completion_url, self.openai_api_base, self.balance_api_url, self.usage_api_url = shared.state.api_host, shared.state.chat_completion_url, shared.state.images_completion_url, shared.state.openai_api_base, shared.state.balance_api_url, shared.state.usage_api_url
         self._refresh_header()
 
     def get_answer_stream_iter(self):
@@ -82,22 +71,65 @@ class OpenAIVisionClient(BaseLLMModel):
                     yield partial_text
             yield partial_text
             return
-        response = self._get_response(stream=True)
-        if response is not None:
-            iter = self._decode_chat_response(response)
-            partial_text = ""
-            batch = []
-            batch_size = 10
-            for i in iter:
-                batch.append(i)
-                if len(batch) >= batch_size:
+    
+        def req_func_iter(class_this):
+            self = class_this
+            response = self._get_response(stream=True)
+            if response is not None:
+                iter = self._decode_chat_response(response)
+                
+                partial_text = ""
+                batch = []
+                batch_size = 10
+                erro_flage = False
+                for i in iter:
+                    if i is False:
+                        erro_flage = True
+                        yield erro_flage
+                    
+                    batch.append(i)
+                    if len(batch) >= batch_size:
+                        partial_text += ''.join(batch)
+                        batch.clear()
+                        yield partial_text
+                if erro_flage is False:
                     partial_text += ''.join(batch)
-                    batch.clear()
                     yield partial_text
-            partial_text += ''.join(batch)
-            yield partial_text
-        else:
-            yield STANDARD_ERROR_MSG + GENERAL_ERROR_MSG
+            else:
+                yield STANDARD_ERROR_MSG + GENERAL_ERROR_MSG
+
+        quit_flag = True
+
+
+        # self.api_key  
+        # self.model_name  
+        # self.chat_completion_url
+        
+        num = 0
+        while quit_flag:
+
+            quit_flag = False
+
+            self.chat_completion_url = f'{self.urls[num]["url"]}/v1/chat/completions'
+            self.api_key = self.urls[num]["key"]
+            num += 1
+            if (num > (len(self.urls)-1)) and (num !=1):
+                yield f"所有线路尝试失败请联系管理员17621713084"
+                break
+            
+
+
+
+            for data in req_func_iter(self):
+                if data is True:
+                    quit_flag = True
+                    yield f"正在切换线路{num}"
+                    break
+                yield data
+
+            time.sleep(5)        
+
+
 
     def get_answer_at_once(self):
         response = self._get_response()
@@ -214,23 +246,18 @@ class OpenAIVisionClient(BaseLLMModel):
         if system_prompt is not None and "o1" not in self.model_name:
             history = [construct_system(system_prompt), *history]
 
-        if self.model_name in "o1-preview,o1-mini":
-            payload = {
-                "model": self.model_name,
-                "messages": history,
-                "temperature": self.temperature,
-                "top_p": self.top_p,
-                "n": self.n_choices,
-            }
-        else:
-            payload = {
-                "model": self.model_name,
-                "messages": history,
-                "temperature": self.temperature,
-                "top_p": self.top_p,
-                "n": self.n_choices,
-                "stream": stream,
-            }
+        
+        payload = {
+            "model": self.model_name,
+            "messages": history,
+            "temperature": self.temperature,
+            "top_p": self.top_p,
+            "n": self.n_choices,
+            "stream": stream,
+        }
+        # print("=====================")
+        # print(payload)
+        # print("=====================")
 
         if self.max_generation_token:
             payload["max_tokens"] = self.max_generation_token
@@ -291,6 +318,10 @@ class OpenAIVisionClient(BaseLLMModel):
         first_content = False
         first_reasoning_content = False
         two_n = 0
+
+        in_reasoning   = False          # 是否位于 <think> … </think>
+        start_of_line  = True           # 下一字符是否为一行的开头
+        PREFIX         = ">    "        # 想缩进多少改这里
         for chunk in response.iter_lines():
             if not chunk:
                 continue  # 跳过空行
@@ -324,14 +355,69 @@ class OpenAIVisionClient(BaseLLMModel):
                             yield content
                         if reasoning_content:
                             yield reasoning_content
+                    if model in "deepseek-reasoner,claude-3-7-sonnet-20250219-thinking":
+                        delta   = chunk_json["choices"][0]["delta"]
+                        content = delta.get("content", "")
+
+                        # ① <think> 单独到来
+                        if content == "<think>":
+                            in_reasoning  = True
+                            start_of_line = True
+                            yield "思考中\n================================\n"
+                            continue                     # 该 token 本身不再输出
+
+                        # ② 遇到 </think>（可能同一 token 里既有思考文字又带 </think>）
+                        if "</think>" in content:
+                            before, _, after = content.partition("</think>")
+
+                            # 先把 </think> 前的部分当作思考区输出
+                            if before:
+                                buf = []
+                                for ch in before:
+                                    if start_of_line:
+                                        buf.append(PREFIX)
+                                        start_of_line = False
+                                    buf.append(ch)
+                                    if ch == "\n":
+                                        start_of_line = True
+                                yield "".join(buf)
+
+                            # 结束思考
+                            in_reasoning = False
+                            yield "\n最终输出\n================================\n"
+
+                            # 如果 </think> 后面还有文字，直接作为最终回答输出
+                            if after:
+                                yield after
+                            continue
+
+                        # ③ 正在思考区
+                        if in_reasoning:
+                            buf = []
+                            for ch in content:           # 逐字符处理，防止“一个 token 就加一次缩进”
+                                if start_of_line:
+                                    buf.append(PREFIX)
+                                    start_of_line = False
+                                buf.append(ch)
+                                if ch == "\n":
+                                    start_of_line = True
+                            yield "".join(buf)
+                            continue
+
+                        # ④ 不在思考区，属于最终回答
+                        yield content
+                    
                     else:
                         # 处理其他模型的响应
                         try:
                             delta = chunk_json["choices"][0]["delta"]
-                            content = delta.get("content", "")
                             reasoning_content = chunk_json["choices"][0]["delta"].get("reasoning_content", "")
+                            content = delta.get("content", "")
+                            
                         except Exception as e:
+                            print(e)
                             content = ""
+                            reasoning_content = ""
                         if content:
                             if first_content is False:
                                 first_content = True
@@ -351,6 +437,8 @@ class OpenAIVisionClient(BaseLLMModel):
                     continue
             else:
                 logging.warning(f"收到未知格式的数据: {chunk_str}")
+                yield False
+                break
                 continue
 
         if error_msg and error_msg != "[DONE]":

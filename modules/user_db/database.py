@@ -84,75 +84,83 @@ class DB:
         cursor.close()
         conn.commit()  # 提交事务
         conn.close()
-
-def get_deduction_amount(txt,model_name,mode):
-    if mode == "input":
-        deduction_tables = {
+#新位置 modules\models\extensions_model_nodes.py
+# def get_deduction_amount(txt,model_name,mode):
+#     if mode == "input":
+#         deduction_tables = {
             
-            "GPT3.5 Turbo":0.036,
-            "GPT3.5 Turbo 16K":0.02,
-            "问答模型4o-online":1.8,
-            '问答模型4o':0.3,
-            "deepseekv3":0.3,
-            'deepseek-reasoner':1.0,
-            "问答模型o3-mini":2.5,
-            '问答模型o1':2.5,
-            '问答模型o1-pre':1.8,
-            '问答模型o1-mini':0.5,
-            '生图模型de3':6,
-            # "GPT4",
-            # "GPT4 32K",
-            # "GPT4 Turbo",
-            # "GPT4 Vision",
-            # "川虎助理",
-            # "DALL-E 3",
-            # "midjourney",
-            # "讯飞星火大模型V3.0",
-            # "讯飞星火大模型V2.0",
-            # "讯飞星火大模型V1.5",
-            # "chatglm-6b",
-            # "chatglm-6b-int4",
-            # "chatglm-6b-int4-ge",
-            # "chatglm2-6b",
-            # "chatglm2-6b-int4",
-            # "chatglm3-6b",
-            # "chatglm3-6b-32k",
+#             "GPT3.5 Turbo":0.036,
+#             "GPT3.5 Turbo 16K":0.02,
+#             "问答模型o4-mini":1,
+#             "问答模型4o-online":1.8,
+#             '问答模型4o':0.3,
+#             "deepseekv3":0.3,
+#             'deepseek-reasoner':1.0,
+#             "问答模型o3-mini":2.5,
+#             '问答模型o1':2.5,
+#             '问答模型o1-pre':1.8,
+#             "gpt-4o-image":1.8,
+#             "问答模型4.5":1.8,
+#             "claude-3-7-sonnet-20250219-thinking":1.8,
+#             '问答模型o1-mini':0.5,
+#             '生图模型de3':6,
+#             # "GPT4",
+#             # "GPT4 32K",
+#             # "GPT4 Turbo",
+#             # "GPT4 Vision",
+#             # "川虎助理",
+#             # "DALL-E 3",
+#             # "midjourney",
+#             # "讯飞星火大模型V3.0",
+#             # "讯飞星火大模型V2.0",
+#             # "讯飞星火大模型V1.5",
+#             # "chatglm-6b",
+#             # "chatglm-6b-int4",
+#             # "chatglm-6b-int4-ge",
+#             # "chatglm2-6b",
+#             # "chatglm2-6b-int4",
+#             # "chatglm3-6b",
+#             # "chatglm3-6b-32k",
 
-        }
-    if mode == "output":
-        deduction_tables = {
-        "GPT3.5 Turbo":0.036,
-        "GPT3.5 Turbo 16K":0.02,
-        "问答模型4o-online":1.8,
-        '问答模型4o':0.3,
-        "deepseekv3":0.3,
-        'deepseek-reasoner':1.0,
-        "问答模型o3-mini":2.5,
-        '问答模型o1':2.5,
-        '问答模型o1-pre':1.8,
-        '问答模型o1-mini':0.5,
-        '生图模型de3':6,
-        # "GPT4",
-        # "GPT4 32K",
-        # "GPT4 Turbo",
-        # "GPT4 Vision",
-        # "川虎助理",
-        # "DALL-E 3",
-        # "midjourney",
-        # "讯飞星火大模型V3.0",
-        # "讯飞星火大模型V2.0",
-        # "讯飞星火大模型V1.5",
-        # "chatglm-6b",
-        # "chatglm-6b-int4",
-        # "chatglm-6b-int4-ge",
-        # "chatglm2-6b",
-        # "chatglm2-6b-int4",
-        # "chatglm3-6b",
-        # "chatglm3-6b-32k",
-        }
+#         }
+#     if mode == "output":
+#         deduction_tables = {
+#         "GPT3.5 Turbo":0.036,
+#         "GPT3.5 Turbo 16K":0.02,
+#         "问答模型o4-mini":1,
+#         "问答模型4o-online":1.8,
+#         '问答模型4o':0.3,
+#         "deepseekv3":0.3,
+#         'deepseek-reasoner':1.0,
+#         "问答模型o3-mini":2.5,
+#         '问答模型o1':2.5,
+#         '问答模型o1-pre':1.8,
+#         "gpt-4o-image":1.8,
+#         "问答模型4.5":1.8,
+#         "claude-3-7-sonnet-20250219-thinking":1.8,
+#         '问答模型o1-mini':0.5,
+#         '生图模型de3':6,
+#         # "GPT4",
+#         # "GPT4 32K",
+#         # "GPT4 Turbo",
+#         # "GPT4 Vision",
+#         # "川虎助理",
+#         # "DALL-E 3",
+#         # "midjourney",
+#         # "讯飞星火大模型V3.0",
+#         # "讯飞星火大模型V2.0",
+#         # "讯飞星火大模型V1.5",
+#         # "chatglm-6b",
+#         # "chatglm-6b-int4",
+#         # "chatglm-6b-int4-ge",
+#         # "chatglm2-6b",
+#         # "chatglm2-6b-int4",
+#         # "chatglm3-6b",
+#         # "chatglm3-6b-32k",
+#         }
     
     
-    return len(txt)/500 *deduction_tables.get(model_name,0.3)
+#     return len(txt)/500 *deduction_tables.get(model_name,0.3)
 
 class User_Db:
     def __init__(self) -> None:
